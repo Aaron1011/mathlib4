@@ -33,7 +33,7 @@ open scoped Function
 
 universe u
 
-theorem foo {R M : Type u} [Ring R] [Zero M] [SMulWithZero R M] [NoZeroDivisors R]
+theorem foo {R M : Type u} [Ring R] [Zero M] [SMulWithZero R M]
   {a : R} {b : M} (hx : a • b ≠ 0) : IsSMulRegular R a := by
   intro w v hwv
   have hgwv : a • (w - v) = 0 := by rw [smul_sub, sub_eq_zero.mpr hwv]
@@ -89,8 +89,11 @@ section Ring
 
 variable [Ring R] (S : Sequence R)
 
+-- a • (kx^2) ≠ 0
+-- (a * k) • 1 x^2  = (a 8≠ 0
+
 /-- Polynomials in a polynomial sequence are linearly independent. -/
-lemma linearIndependent [NoZeroDivisors R] :
+lemma linearIndependent :
     LinearIndependent R S := linearIndependent_iff'.mpr <| fun s g eqzero i hi ↦ by
   by_cases hsupzero : s.sup (fun i ↦ (g i • S i).degree) = ⊥
   · have le_sup := Finset.le_sup hi (f := fun i ↦ (g i • S i).degree)
