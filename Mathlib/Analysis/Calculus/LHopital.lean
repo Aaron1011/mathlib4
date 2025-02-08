@@ -89,6 +89,50 @@ theorem lhopital_zero_right_on_Ioo (hab : a < b) (hff' : ∀ x ∈ Ioo a b, HasD
     try simp
     linarith [this]
 
+theorem lhopital_atTop_right_on_Ioo (hab : a < b) (hff' : ∀ x ∈ Ioo a b, HasDerivAt f (f' x) x)
+    (hgg' : ∀ x ∈ Ioo a b, HasDerivAt g (g' x) x) (hg' : ∀ x ∈ Ioo a b, g' x ≠ 0)
+    (hfa : Tendsto f (𝓝[>] a) atTop) (hga : Tendsto g (𝓝[>] a) atTop)
+    (hdiv : Tendsto (fun x => f' x / g' x) (𝓝[>] a) l) :
+    Tendsto (fun x => f x / g x) (𝓝[>] a) l := by
+  have sub : ∀ x ∈ Ioo a b, Ioo a x ⊆ Ioo a b := fun x hx =>
+    Ioo_subset_Ioo (le_refl a) (le_of_lt hx.2)
+  have hg : ∀ x ∈ Ioo a b, g x ≠ 0 := by
+    sorry
+    -- intro x hx h
+    -- have : Tendsto g (𝓝[<] x) (𝓝 0) := by
+    --   rw [← h, ← nhdsWithin_Ioo_eq_nhdsLT hx.1]
+    --   exact ((hgg' x hx).continuousAt.continuousWithinAt.mono <| sub x hx).tendsto
+    -- obtain ⟨y, hyx, hy⟩ : ∃ c ∈ Ioo a x, g' c = 0 :=
+    --   exists_hasDerivAt_eq_zero' hx.1 hga this fun y hy => hgg' y <| sub x hx hy
+    -- exact hg' y (sub x hx hyx) hy
+  have : ∀ x ∈ Ioo a b, ∃ c ∈ Ioo a x, f x * g' c = g x * f' c := by
+    intro x hx
+    rw [← sub_zero (f x), ← sub_zero (g x)]
+    exact exists_ratio_hasDerivAt_eq_ratio_slope' g g' hx.1 f f' (fun y hy => hgg' y <| sub x hx hy)
+      (fun y hy => hff' y <| sub x hx hy) hga hfa
+      (tendsto_nhdsWithin_of_tendsto_nhds (hgg' x hx).continuousAt.tendsto)
+      (tendsto_nhdsWithin_of_tendsto_nhds (hff' x hx).continuousAt.tendsto)
+  choose! c hc using this
+  have : ∀ x ∈ Ioo a b, ∀ y ∈ Ioo a b, x < y → ((fun x' => f' x' / g' x') ∘ c) x = f x / g x := by
+    intro x hx
+    rcases hc x hx with ⟨h₁, h₂⟩
+    field_simp [hg x hx, hg' (c x) ((sub x hx) h₁)]
+    simp only [h₂]
+    rw [mul_comm]
+  have cmp : ∀ x ∈ Ioo a b, a < c x ∧ c x < x := fun x hx => (hc x hx).1
+  rw [← nhdsWithin_Ioo_eq_nhdsGT hab]
+  apply tendsto_nhdsWithin_congr this
+  apply hdiv.comp
+  refine tendsto_nhdsWithin_of_tendsto_nhds_of_eventually_within _
+    (tendsto_of_tendsto_of_tendsto_of_le_of_le' tendsto_const_nhds
+      (tendsto_nhdsWithin_of_tendsto_nhds tendsto_id) ?_ ?_) ?_
+  all_goals
+    apply eventually_nhdsWithin_of_forall
+    intro x hx
+    have := cmp x hx
+    try simp
+    linarith [this]
+
 theorem lhopital_zero_right_on_Ico (hab : a < b) (hff' : ∀ x ∈ Ioo a b, HasDerivAt f (f' x) x)
     (hgg' : ∀ x ∈ Ioo a b, HasDerivAt g (g' x) x) (hcf : ContinuousOn f (Ico a b))
     (hcg : ContinuousOn g (Ico a b)) (hg' : ∀ x ∈ Ioo a b, g' x ≠ 0) (hfa : f a = 0) (hga : g a = 0)
