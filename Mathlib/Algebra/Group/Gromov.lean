@@ -346,6 +346,8 @@ instance LipschitzH.instAddCommMonoid: AddCommMonoid (LipschitzH (G := G)) := {
 -- V is the vector space
 def V := Module ℂ (LipschitzH (G := G))
 
+
+
 @[simp]
 theorem LipschitzH.add_apply (f g: LipschitzH (G := G)) (x: G): (f + g).toFun x = f x + g x := by
   unfold LipschitzH.add
@@ -428,6 +430,22 @@ lemma singleton_pairwise_disjoint (s: Set (Additive (MulOpposite G))) : s.Pairwi
   unfold Set.singleton at hab
   simp at hab
   exact hab.symm
+
+def foo: Submodule ℂ LipschitzH (G := G) := {
+  carrier := {f: LipschitzH (G := G) | ∀ x: G, f x = 0}
+  zero_mem' := by
+    simp
+  add_mem' := by
+    intro f g hf hg x
+    simp only [DFunLike.coe_add] at hf hg
+    rw [hf, hg]
+    simp
+  smul_mem' := by
+    intro c f hf x
+    simp only [DFunLike.coe_smul] at hf
+    rw [hf]
+    simp
+}
 
 
 -- Use the fact that we have the discrete topology
