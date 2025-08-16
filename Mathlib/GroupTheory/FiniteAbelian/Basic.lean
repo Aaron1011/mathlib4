@@ -173,9 +173,9 @@ theorem equiv_prod_multiplicative_zmod_of_finite (G : Type*) [CommGroup G] [Fini
   exact ⟨ι, inst, n, h₁, ⟨MulEquiv.toAdditive.symm <| h₂.some.trans <|
     (DirectSum.addEquivProd _).trans <| MulEquiv.toAdditive'' <| MulEquiv.piMultiplicative _⟩⟩
 
-/-- The **Structure theorem of finitely generated abelian groups** in a multiplicative version : Any finitely generated abelian
-group is the product of a power of `ℤ` and a direct product of some `ZMod (p i ^ e i)` for some
-prime powers `p i ^ e i`. -/
+/-- The **Structure theorem of finitely generated abelian groups** in a multiplicative version :
+    Any finitely generated abelian group is the product of a power of `ℤ`
+    and a direct product of some `ZMod (p i ^ e i)` for some prime powers `p i ^ e i`. -/
 theorem equiv_free_prod_directSum_zmod (G : Type*) [CommGroup G] [hG : Group.FG G] :
     ∃ (ι j : Type) (_ : Fintype ι) (_ : Fintype j) (p : ι → ℕ)
     (_ : ∀ i, Nat.Prime <| p i) (e : ι → ℕ),
