@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Chris Hughes, Abhimanyu Pallavi Sudhir, Jean Lo, Calle Sönne
 -/
 import Mathlib.Analysis.Calculus.ContDiff.RCLike
+import Mathlib.Analysis.Calculus.Deriv.Inv
 import Mathlib.Analysis.Calculus.IteratedDeriv.Lemmas
 import Mathlib.Analysis.Complex.RealDeriv
 import Mathlib.Analysis.SpecialFunctions.Exp
@@ -205,6 +206,26 @@ open Complex in
 theorem iteratedDeriv_cexp_const_mul (n : ℕ) (c : ℂ) :
     (iteratedDeriv n fun s : ℂ => exp (c * s)) = fun s => c ^ n * exp (c * s) := by
   rw [iteratedDeriv_comp_const_mul contDiff_exp, iteratedDeriv_eq_iterate, iter_deriv_exp]
+
+open Complex in
+theorem deriv_cexp_iff {f : ℂ → ℂ} (h0 : f 0 = 1) (hf : Differentiable ℂ f) :
+    deriv f = f ↔ f = exp := ⟨
+  fun h ↦ by
+    have : ∀ x, deriv (f / exp) x = 0 := fun _ ↦ by
+      rw [deriv_div]
+      · simp [h]
+      · exact hf _
+      · exact differentiableAt_exp
+      · exact exp_ne_zero _
+    have h_const := is_const_of_deriv_eq_zero (by fun_prop (disch := simp)) this <| 0
+    simp only [Pi.div_apply, h0, exp_zero, ne_eq,
+               one_ne_zero, not_false_eq_true, div_self] at h_const
+    conv at h_const =>
+      intro y
+      rw [eq_comm, div_eq_one_iff_eq (by grind)]
+    exact funext h_const,
+  fun h ↦ by simp [h]
+⟩
 
 /-! ## `Real.exp` -/
 
