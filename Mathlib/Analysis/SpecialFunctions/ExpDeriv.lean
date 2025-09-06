@@ -207,6 +207,38 @@ theorem iteratedDeriv_cexp_const_mul (n : ℕ) (c : ℂ) :
     (iteratedDeriv n fun s : ℂ => exp (c * s)) = fun s => c ^ n * exp (c * s) := by
   rw [iteratedDeriv_comp_const_mul contDiff_exp, iteratedDeriv_eq_iterate, iter_deriv_exp]
 
+theorem deriv_eq_self {f g : ℂ → ℂ} (hf0 : f 0 = 1) (hf : Differentiable ℂ f) (hg0 : g 0 = 1)
+    (hg : Differentiable ℂ g) (hg_self: deriv g = g) (g_ne_zero : ∀ z, g z ≠ 0) :
+    deriv f = f ↔ f = g := by
+
+  refine ⟨?_, ?_⟩
+  .
+    intro f_eq
+    have : ∀ x, deriv (f / g) x = 0 := fun x ↦ by
+      rw [deriv_div]
+      ·
+        simp [f_eq, hg_self]
+      · exact hf _
+      · exact hg _
+      · apply g_ne_zero
+    have h_const := is_const_of_deriv_eq_zero ?_ this 0
+    . simp at h_const
+      conv at h_const =>
+        intro y
+        rw [eq_comm]
+        rw [hg0]
+
+    simp only [Pi.div_apply, h0, exp_zero, ne_eq,
+               one_ne_zero, not_false_eq_true, div_self] at h_const
+    conv at h_const =>
+      intro y
+      rw [eq_comm, div_eq_one_iff_eq (by grind)]
+    exact funext h_const,
+  sorry
+  --refine {?_, ?_}
+  --. sorry
+  --. sorry
+
 open Complex in
 theorem deriv_cexp_iff {f : ℂ → ℂ} (h0 : f 0 = 1) (hf : Differentiable ℂ f) :
     deriv f = f ↔ f = exp := ⟨
