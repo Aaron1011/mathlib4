@@ -207,8 +207,9 @@ theorem iteratedDeriv_cexp_const_mul (n : ℕ) (c : ℂ) :
     (iteratedDeriv n fun s : ℂ => exp (c * s)) = fun s => c ^ n * exp (c * s) := by
   rw [iteratedDeriv_comp_const_mul contDiff_exp, iteratedDeriv_eq_iterate, iter_deriv_exp]
 
-theorem deriv_eq_self {f g : ℂ → ℂ} (hf0 : f 0 = 1) (hf : Differentiable ℂ f) (hg0 : g 0 = 1)
-    (hg : Differentiable ℂ g) (hg_self: deriv g = g) (g_ne_zero : ∀ z, g z ≠ 0) :
+theorem deriv_eq_self {𝕜: Type*} [RCLike 𝕜]
+  {f g : 𝕜 → 𝕜} (hf0 : f 0 = 1) (hf : Differentiable 𝕜 f) (hg0 : g 0 = 1)
+  (hg : Differentiable 𝕜 g) (hg_self: deriv g = g) (g_ne_zero : ∀ z, g z ≠ 0) :
     deriv f = f ↔ f = g := by
 
   refine ⟨?_, ?_⟩
@@ -221,7 +222,7 @@ theorem deriv_eq_self {f g : ℂ → ℂ} (hf0 : f 0 = 1) (hf : Differentiable �
       · exact hf _
       · exact hg _
       · apply g_ne_zero
-    have h_const := is_const_of_deriv_eq_zero ?_ this 0
+    have h_const := is_const_of_deriv_eq_zero ?_ this (0 : 𝕜)
     . simp at h_const
       conv at h_const =>
         intro y
