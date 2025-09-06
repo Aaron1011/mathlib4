@@ -207,46 +207,38 @@ theorem iteratedDeriv_cexp_const_mul (n : ℕ) (c : ℂ) :
     (iteratedDeriv n fun s : ℂ => exp (c * s)) = fun s => c ^ n * exp (c * s) := by
   rw [iteratedDeriv_comp_const_mul contDiff_exp, iteratedDeriv_eq_iterate, iter_deriv_exp]
 
-theorem deriv_eq_self {𝕜: Type*} [RCLike 𝕜]
+theorem deriv_eq_self {𝕜 : Type*} [RCLike 𝕜]
   {f g : 𝕜 → 𝕜} (hf0 : f 0 = 1) (hf : Differentiable 𝕜 f) (hg0 : g 0 = 1)
-  (hg : Differentiable 𝕜 g) (hg_self: deriv g = g) (g_ne_zero : ∀ z, g z ≠ 0) :
+  (hg : Differentiable 𝕜 g) (hg_self : deriv g = g) (g_ne_zero : ∀ z, g z ≠ 0) :
     deriv f = f ↔ f = g := by
 
   refine ⟨?_, ?_⟩
-  .
-    intro f_eq
+  · intro f_eq
     have : ∀ x, deriv (f / g) x = 0 := fun x ↦ by
       rw [deriv_div]
-      ·
-        simp [f_eq, hg_self]
+      · simp [f_eq, hg_self]
       · exact hf _
       · exact hg _
       · apply g_ne_zero
+
     have h_const := is_const_of_deriv_eq_zero ?_ this (0 : 𝕜)
-    . simp at h_const
+    · simp at h_const
       conv at h_const =>
         intro y
         rw [eq_comm]
         rw [hg0, hf0]
         simp
-        rw [div_eq_one_iff_eq (by grind)]
+        rw [div_eq_one_iff_eq (g_ne_zero _)]
 
       apply funext h_const
-    . fun_prop (disch := assumption)
-  . intro f_eq_g
+    · fun_prop (disch := assumption)
+  · intro f_eq_g
     simp [f_eq_g]
     exact hg_self
 
 open Complex in
 theorem deriv_cexp_iff {f : ℂ → ℂ} (h0 : f 0 = 1) (hf : Differentiable ℂ f) :
-    deriv f = f ↔ f = exp := by
-  apply deriv_eq_self
-  . exact h0
-  . exact hf
-  . simp
-  . simp
-  . simp
-  . simp
+    deriv f = f ↔ f = exp := deriv_eq_self h0 hf (by simp) (by simp) (by simp) (by simp)
 
 /-! ## `Real.exp` -/
 
@@ -432,11 +424,4 @@ theorem iteratedDeriv_exp_const_mul (n : ℕ) (c : ℝ) :
 
 open Real in
 theorem deriv_exp_iff {f : ℝ → ℝ} (h0 : f 0 = 1) (hf : Differentiable ℝ f) :
-    deriv f = f ↔ f = exp := by
-  apply deriv_eq_self
-  . exact h0
-  . exact hf
-  . simp
-  . apply Real.differentiable_exp
-  . simp
-  . simp
+    deriv f = f ↔ f = exp := deriv_eq_self h0 hf (by simp) (by simp) (by simp) (by simp)
