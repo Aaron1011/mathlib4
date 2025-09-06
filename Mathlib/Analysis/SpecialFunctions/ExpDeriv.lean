@@ -239,23 +239,14 @@ theorem deriv_eq_self {𝕜: Type*} [RCLike 𝕜]
 
 open Complex in
 theorem deriv_cexp_iff {f : ℂ → ℂ} (h0 : f 0 = 1) (hf : Differentiable ℂ f) :
-    deriv f = f ↔ f = exp := ⟨
-  fun h ↦ by
-    have : ∀ x, deriv (f / exp) x = 0 := fun _ ↦ by
-      rw [deriv_div]
-      · simp [h]
-      · exact hf _
-      · exact differentiableAt_exp
-      · exact exp_ne_zero _
-    have h_const := is_const_of_deriv_eq_zero (by fun_prop (disch := simp)) this <| 0
-    simp only [Pi.div_apply, h0, exp_zero, ne_eq,
-               one_ne_zero, not_false_eq_true, div_self] at h_const
-    conv at h_const =>
-      intro y
-      rw [eq_comm, div_eq_one_iff_eq (by grind)]
-    exact funext h_const,
-  fun h ↦ by simp [h]
-⟩
+    deriv f = f ↔ f = exp := by
+  apply deriv_eq_self
+  . exact h0
+  . exact hf
+  . simp
+  . simp
+  . simp
+  . simp
 
 /-! ## `Real.exp` -/
 
@@ -438,3 +429,14 @@ open Real in
 theorem iteratedDeriv_exp_const_mul (n : ℕ) (c : ℝ) :
     (iteratedDeriv n fun s => exp (c * s)) = fun s => c ^ n * exp (c * s) := by
   rw [iteratedDeriv_comp_const_mul contDiff_exp, iteratedDeriv_eq_iterate, iter_deriv_exp]
+
+open Real in
+theorem deriv_exp_iff {f : ℝ → ℝ} (h0 : f 0 = 1) (hf : Differentiable ℝ f) :
+    deriv f = f ↔ f = exp := by
+  apply deriv_eq_self
+  . exact h0
+  . exact hf
+  . simp
+  . apply Real.differentiable_exp
+  . simp
+  . simp
