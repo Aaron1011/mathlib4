@@ -226,18 +226,15 @@ theorem deriv_eq_self {f g : ℂ → ℂ} (hf0 : f 0 = 1) (hf : Differentiable �
       conv at h_const =>
         intro y
         rw [eq_comm]
-        rw [hg0]
+        rw [hg0, hf0]
+        simp
+        rw [div_eq_one_iff_eq (by grind)]
 
-    simp only [Pi.div_apply, h0, exp_zero, ne_eq,
-               one_ne_zero, not_false_eq_true, div_self] at h_const
-    conv at h_const =>
-      intro y
-      rw [eq_comm, div_eq_one_iff_eq (by grind)]
-    exact funext h_const,
-  sorry
-  --refine {?_, ?_}
-  --. sorry
-  --. sorry
+      apply funext h_const
+    . fun_prop (disch := assumption)
+  . intro f_eq_g
+    simp [f_eq_g]
+    exact hg_self
 
 open Complex in
 theorem deriv_cexp_iff {f : ℂ → ℂ} (h0 : f 0 = 1) (hf : Differentiable ℂ f) :
