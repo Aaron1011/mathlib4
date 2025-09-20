@@ -187,11 +187,6 @@ theorem tan_three_mul {z : ℂ} : tan (3 * z) = (3 * tan z - (tan z)^3) / (1 - 3
       rw [tan_eq_sin_div_cos]
       field_simp
 
-    -- apply_fun (fun x => x *1 )
-    -- beta_reduce
-    -- nth_rw 1 [← eq_one]
-    --rw [div_mul_div_comm]
-
     conv =>
       lhs
       rhs
@@ -236,33 +231,6 @@ theorem tan_three_mul {z : ℂ} : tan (3 * z) = (3 * tan z - (tan z)^3) / (1 - 3
 
 
     field_simp
-    rw [mul_sub]
-    rw [mul_add]
-    rw [mul_add]
-    simp
-    rw [← mul_assoc]
-    rw [mul_comm]
-    rw [mul_assoc]
-    rw [← pow_succ']
-    simp
-    rw [← mul_assoc]
-    rw [← pow_succ']
-    simp
-    conv =>
-      lhs
-      lhs
-      equals 3 * (tan z) - (tan z)^3 =>
-        ring
-
-
-    conv =>
-      lhs
-      rhs
-      ring
-
-
-    rw [mul_sub]
-    rw [mul_comm]
     ring
 
 theorem tan_add_mul_I {x y : ℂ}
