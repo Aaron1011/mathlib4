@@ -163,6 +163,108 @@ theorem tan_two_mul {z : ℂ} : tan (2 * z) = (2 : ℂ) * tan z / ((1 : ℂ) - t
   · rw [not_forall_not] at h
     rw [two_mul, two_mul, sq, tan_add (Or.inr ⟨h, h⟩)]
 
+theorem cos_inv_sub {z: ℂ} (hz: cos z ≠ 0): (1 / (cos z)^2) - (tan z)^2 = 1 := by
+  rw [tan_eq_sin_div_cos]
+  rw [sub_eq_iff_eq_add]
+  field_simp
+  exact Eq.symm (cos_sq_add_sin_sq z)
+
+theorem tan_three_mul {z : ℂ} : tan (3 * z) = (3 * tan z - (tan z)^3) / (1 - 3 * (tan z ^ 2)) := by
+  nth_rw 1 [tan]
+  rw [Complex.sin_three_mul, Complex.cos_three_mul]
+
+
+  by_cases three_eq: (cos z)^3 = 0
+  .
+    simp at three_eq
+    simp [tan, three_eq]
+  .
+    simp at three_eq
+    have eq_one: (cos z)^3 / (cos z)^3 = 1 := by
+      simp [three_eq]
+
+    have sin_eq: sin z = (tan z) * (cos z) := by
+      rw [tan_eq_sin_div_cos]
+      field_simp
+
+    -- apply_fun (fun x => x *1 )
+    -- beta_reduce
+    -- nth_rw 1 [← eq_one]
+    --rw [div_mul_div_comm]
+
+    conv =>
+      lhs
+      rhs
+      equals (cos z)^3 * (4 - 3 / (cos z)^2) =>
+        field_simp
+
+
+    conv =>
+      lhs
+      lhs
+      equals (cos z)^3 * ((3 * (tan z) / (cos z)^2) - (4 * (tan z) ^3)) =>
+        rw [tan_eq_sin_div_cos]
+        field_simp
+
+
+    conv =>
+      lhs
+      rhs
+      rhs
+      rhs
+      equals 3 * (1 + (tan z)^2) =>
+        rw [div_eq_mul_one_div]
+        have foo := cos_inv_sub three_eq
+        rw [sub_eq_iff_eq_add] at foo
+        rw [foo]
+
+
+
+
+    conv =>
+      lhs
+      lhs
+      rhs
+      lhs
+      rw [div_eq_mul_one_div]
+      rhs
+      equals (1 + (tan z)^2) =>
+        have foo := cos_inv_sub three_eq
+        rw [sub_eq_iff_eq_add] at foo
+        rw [foo]
+
+
+
+    field_simp
+    rw [mul_sub]
+    rw [mul_add]
+    rw [mul_add]
+    simp
+    rw [← mul_assoc]
+    rw [mul_comm]
+    rw [mul_assoc]
+    rw [← pow_succ']
+    simp
+    rw [← mul_assoc]
+    rw [← pow_succ']
+    simp
+    conv =>
+      lhs
+      lhs
+      equals 3 * (tan z) - (tan z)^3 =>
+        ring
+
+
+    conv =>
+      lhs
+      rhs
+      ring
+
+
+    rw [mul_sub]
+    rw [mul_comm]
+    ring
+
 theorem tan_add_mul_I {x y : ℂ}
     (h :
       ((∀ k : ℤ, x ≠ (2 * k + 1) * π / 2) ∧ ∀ l : ℤ, y * I ≠ (2 * l + 1) * π / 2) ∨
