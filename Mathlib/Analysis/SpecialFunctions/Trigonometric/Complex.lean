@@ -193,14 +193,12 @@ theorem tan_three_mul {z : ℂ} : tan (3 * z) = (3 * tan z - (tan z)^3) / (1 - 3
       equals (cos z)^3 * (4 - 3 / (cos z)^2) =>
         field_simp
 
-
     conv =>
       lhs
       lhs
       equals (cos z)^3 * ((3 * (tan z) / (cos z)^2) - (4 * (tan z) ^3)) =>
         rw [tan_eq_sin_div_cos]
         field_simp
-
 
     conv =>
       lhs
@@ -213,9 +211,6 @@ theorem tan_three_mul {z : ℂ} : tan (3 * z) = (3 * tan z - (tan z)^3) / (1 - 3
         rw [sub_eq_iff_eq_add] at foo
         rw [foo]
 
-
-
-
     conv =>
       lhs
       lhs
@@ -227,8 +222,6 @@ theorem tan_three_mul {z : ℂ} : tan (3 * z) = (3 * tan z - (tan z)^3) / (1 - 3
         have foo := cos_inv_sub three_eq
         rw [sub_eq_iff_eq_add] at foo
         rw [foo]
-
-
 
     field_simp
     ring
