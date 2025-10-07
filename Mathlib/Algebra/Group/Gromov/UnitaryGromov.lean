@@ -359,6 +359,8 @@ lemma volume_packing (n : ℕ) (hn : 0 < n) (ε : ℝ) (hε : 0 < ε) :
     have translate_ball (d : ℝ) (hd : 0 < d) (g : (Matrix.unitaryGroup (Fin n) ℂ)): Metric.ball g d = (fun x => g * x) '' (Metric.ball (1 : (Matrix.unitaryGroup (Fin n) ℂ)) d) := by
       ext a
       simp [dist, dist_eq_norm_sub]
+
+
       conv =>
         rhs
         arg 1
