@@ -25,7 +25,7 @@ This file also contains the Lᵖ version of the strong law of large numbers prov
 ## Implementation
 
 The main point is to prove the result for real-valued random variables, as the general case
-of Banach-space valued random variables follows from this case and approximation by simple
+of Banach-space-valued random variables follows from this case and approximation by simple
 functions. The real version is given in `ProbabilityTheory.strong_law_ae_real`.
 
 We follow the proof by Etemadi
@@ -215,7 +215,7 @@ theorem sum_prob_mem_Ioc_le {X : Ω → ℝ} (hint : Integrable X) (hnonneg : 0 
     (hKN : K ≤ N) :
     ∑ j ∈ range K, ℙ {ω | X ω ∈ Set.Ioc (j : ℝ) N} ≤ ENNReal.ofReal (𝔼[X] + 1) := by
   let ρ : Measure ℝ := Measure.map X ℙ
-  haveI : IsProbabilityMeasure ρ := isProbabilityMeasure_map hint.aemeasurable
+  haveI : IsProbabilityMeasure ρ := Measure.isProbabilityMeasure_map hint.aemeasurable
   have A : ∑ j ∈ range K, ∫ _ in j..N, (1 : ℝ) ∂ρ ≤ 𝔼[X] + 1 :=
     calc
       ∑ j ∈ range K, ∫ _ in j..N, (1 : ℝ) ∂ρ =
@@ -596,7 +596,7 @@ requires pairwise independence. Superseded by `strong_law_ae`, which works for r
 taking values in any Banach space. -/
 theorem strong_law_ae_real {Ω : Type*} {m : MeasurableSpace Ω} {μ : Measure Ω}
     (X : ℕ → Ω → ℝ) (hint : Integrable (X 0) μ)
-    (hindep : Pairwise ((IndepFun · · μ) on X))
+    (hindep : Pairwise ((· ⟂ᵢ[μ] ·) on X))
     (hident : ∀ i, IdentDistrib (X i) (X 0) μ μ) :
     ∀ᵐ ω ∂μ, Tendsto (fun n : ℕ => (∑ i ∈ range n, X i ω) / n) atTop (𝓝 μ[X 0]) := by
   let mΩ : MeasureSpace Ω := ⟨μ⟩
@@ -643,7 +643,7 @@ open Set TopologicalSpace
 the composition of the random variables with a simple function satisfies the strong law of large
 numbers. -/
 lemma strong_law_ae_simpleFunc_comp (X : ℕ → Ω → E) (h' : Measurable (X 0))
-    (hindep : Pairwise ((IndepFun · · μ) on X))
+    (hindep : Pairwise ((· ⟂ᵢ[μ] ·) on X))
     (hident : ∀ i, IdentDistrib (X i) (X 0) μ μ) (φ : SimpleFunc E E) :
     ∀ᵐ ω ∂μ,
       Tendsto (fun n : ℕ ↦ (n : ℝ) ⁻¹ • (∑ i ∈ range n, φ (X i ω))) atTop (𝓝 μ[φ ∘ (X 0)]) := by
@@ -694,7 +694,7 @@ assuming measurability in addition to integrability. This is weakened to ae meas
 the full version `ProbabilityTheory.strong_law_ae`. -/
 lemma strong_law_ae_of_measurable
     (X : ℕ → Ω → E) (hint : Integrable (X 0) μ) (h' : StronglyMeasurable (X 0))
-    (hindep : Pairwise ((IndepFun · · μ) on X))
+    (hindep : Pairwise ((· ⟂ᵢ[μ] ·) on X))
     (hident : ∀ i, IdentDistrib (X i) (X 0) μ μ) :
     ∀ᵐ ω ∂μ, Tendsto (fun n : ℕ ↦ (n : ℝ) ⁻¹ • (∑ i ∈ range n, X i ω)) atTop (𝓝 μ[X 0]) := by
   /- Choose a simple function `φ` such that `φ (X 0)` approximates well enough `X 0` -- this is
@@ -785,7 +785,7 @@ identically distributed integrable random variables taking values in a Banach sp
 then `n⁻¹ • ∑ i ∈ range n, X i` converges almost surely to `𝔼[X 0]`. We give here the strong
 version, due to Etemadi, that only requires pairwise independence. -/
 theorem strong_law_ae (X : ℕ → Ω → E) (hint : Integrable (X 0) μ)
-    (hindep : Pairwise ((IndepFun · · μ) on X))
+    (hindep : Pairwise ((· ⟂ᵢ[μ] ·) on X))
     (hident : ∀ i, IdentDistrib (X i) (X 0) μ μ) :
     ∀ᵐ ω ∂μ, Tendsto (fun n : ℕ ↦ (n : ℝ) ⁻¹ • (∑ i ∈ range n, X i ω)) atTop (𝓝 μ[X 0]) := by
   -- First exclude the trivial case where the space is not a probability space
@@ -829,7 +829,7 @@ variable {Ω : Type*} {mΩ : MeasurableSpace Ω} {μ : Measure Ω}
 identically distributed random variables in Lᵖ, then `n⁻¹ • ∑ i ∈ range n, X i`
 converges in `Lᵖ` to `𝔼[X 0]`. -/
 theorem strong_law_Lp {p : ℝ≥0∞} (hp : 1 ≤ p) (hp' : p ≠ ∞) (X : ℕ → Ω → E)
-    (hℒp : MemLp (X 0) p μ) (hindep : Pairwise ((IndepFun · · μ) on X))
+    (hℒp : MemLp (X 0) p μ) (hindep : Pairwise ((· ⟂ᵢ[μ] ·) on X))
     (hident : ∀ i, IdentDistrib (X i) (X 0) μ μ) :
     Tendsto (fun (n : ℕ) => eLpNorm (fun ω => (n : ℝ) ⁻¹ • (∑ i ∈ range n, X i ω) - μ[X 0]) p μ)
       atTop (𝓝 0) := by
