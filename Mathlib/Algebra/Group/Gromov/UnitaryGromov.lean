@@ -4085,6 +4085,18 @@ lemma central_trivial_virtually_abelian (n : ℕ) (hn : 2 ≤ n) (G : Subgroup (
         exact a_dist
       )⟩))
 
+    have new_s_poly: ∀ (r: ℕ), #(Finset.image (fun a ↦ ↑a) (Finset.image s_to_map S_finite.toFinset.attach ^ r)) ≤ S_poly_data.S_poly_const * r ^ S_poly_data.S_poly_deg := by
+      intro r
+      simp [s_to_map]
+      conv =>
+        lhs
+        arg 1
+        lhs
+        unfold Set.Finite.toFinset S
+
+      simp only [Set.toFinset_union]
+      sorry
+
 
     let h_n_data: HnData := {
       d := n
@@ -4345,6 +4357,7 @@ lemma central_trivial_virtually_abelian (n : ℕ) (hn : 2 ≤ n) (G : Subgroup (
             --ext g
             --simp
 
+        --rw [Set.Finite.coe_toFinset]
         conv =>
           lhs
           equals #(Finset.image (Subtype.val) (S_finite.toFinset ^ r)) =>
