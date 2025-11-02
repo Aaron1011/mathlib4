@@ -863,6 +863,10 @@ lemma comm_trivial_implies_nilpotent {G: Type*} [Group G] (S: Set G) (hS: Subgro
         exact y_conj
   }
 
+  let comm_n (n: ℕ) := Subgroup.closure (iterate_comm_set (S ∪ S⁻¹) n)
+
+  have comm_n_in: ∀ n: ℕ, Subgroup.closure (iterate_comm_set (S ∪ S⁻¹) n) ≤ Subgroup.comap (Quotient.mk' _) (Subgroup.center (G / (Subgroup.closure (iterate_comm_set (S ∪ S⁻¹) n)))) := by
+    sorry
 
 
   have upper_central_series_top: upperCentralSeries G n = ⊤ := by
