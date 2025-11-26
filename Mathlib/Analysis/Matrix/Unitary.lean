@@ -30,8 +30,20 @@ lemma centralizer_iso {n: ℕ} [hn: NeZero n] (G: Subgroup (Matrix.unitaryGroup 
 
 
   obtain ⟨k, hk⟩ := Module.End.exists_eigenvalue g.val.val.toLin'
-  by_cases eigenspace_top: Module.End.eigenspace g.val.val.toLin' k = ⊤
+  by_cases gen_eigenspace_top: Module.End.maxGenEigenspace g.val.val.toLin' k = ⊤
   .
+
+    have eigenspace_top: Module.End.eigenspace g.val.val.toLin' k = ⊤ := by
+      ext a
+      simp
+      have a_mem_top: a ∈ (⊤ : (Submodule ℂ (Fin n → ℂ))) := by simp
+      rw [← gen_eigenspace_top] at a_mem_top
+      simp at a_mem_top
+      sorry
+
+    rw [Module.End.maxGenEigenspace_eq] at gen_eigenspace_top
+    apply Module.End.HasEigenvalue.exists_hasEigenvector at hk
+
     have eq_diag := diag_of_eigenspace_span g.val.val.toLin' k eigenspace_top
     specialize g_not k
     apply_fun (fun f => f.toMatrix') at eq_diag
@@ -42,10 +54,135 @@ lemma centralizer_iso {n: ℕ} [hn: NeZero n] (G: Subgroup (Matrix.unitaryGroup 
     rw [iSup_split_single _ k] at span
     rw [← codisjoint_iff] at span
 
-    have other_ne_bot := Codisjoint.ne_bot_of_ne_top span eigenspace_top
+    have other_ne_bot := Codisjoint.ne_bot_of_ne_top span gen_eigenspace_top
+    rw [codisjoint_iff] at span
+
+    have preserves := Module.End.mapsTo_genEigenspace_of_comm (f := g.val.val.toLin') (g := g.val.val.toLin') (by simp) k (Module.End.maxGenEigenspaceIndex g.val.val.toLin' k)
+    rw [← Module.End.maxGenEigenspace_eq] at preserves
+    rw [← iSup_ne_bot_subtype] at span
+
+    have new_ne_bot: ⨆ (i : Module.End.Eigenvalues g.val.val.toLin'), ⨆ (_: i.val ≠ k), Module.End.maxGenEigenspace g.val.val.toLin' i ≠ ⊥ := by
+      sorry
 
 
-  let f: Subgroup.centralizer {g} ≃* A × B := {
 
-  }
-  sorry
+    -- nth_rw 1 [iSup_subtype] at span
+    -- simp at span
+    -- conv at span =>
+    --   lhs
+    --   rhs
+    --   arg 1
+    --   intro i
+    --   arg 1
+    --   intro hi
+
+
+    have other_invariant:  ⨆ (i : { i : Module.End.Eigenvalues g.val.val.toLin' // i.val ≠ k }), Module.End.maxGenEigenspace g.val.val.toLin' i ∈ (Module.End.invtSubmodule g.val.val.toLin') := by
+      apply SupClosed.iSup_mem
+      . simp
+      . simp
+      .
+        intro i
+        simp
+        apply Module.End.mapsTo_genEigenspace_of_comm
+        simp
+
+    rw [Module.End.mem_invtSubmodule_iff_forall_mem_of_mem] at other_invariant
+
+
+    let map_first (h: Subgroup.centralizer {g}) := h.val.val.val.toLin'.restrict (Module.End.mapsTo_genEigenspace_of_comm (f := g.val.val.toLin') (g := h.val.val.val.toLin') (by
+      have foo := h.property
+      rw [Subgroup.mem_centralizer_iff] at foo
+      rw [commute_iff_eq]
+      simp at foo
+      apply_fun (fun m => m.val.val.toLin') at foo
+      simp at foo
+      exact foo
+    ) k ⊤)
+
+    let d := Module.finrank ℂ (Module.End.genEigenspace g.val.val.toLin' k (Module.End.maxGenEigenspaceIndex g.val.val.toLin' k))
+
+    let map_first_unitary (h: Subgroup.centralizer {g}): Matrix.unitaryGroup (Fin d) ℂ := {
+      val := by
+        let foo := (map_first h)
+        sorry
+      property := sorry
+    }
+
+    let map_first_hom: MonoidHom (Subgroup.centralizer {g}) _ := {
+      toFun := map_first_unitary
+      map_one' := by
+        simp [map_first_unitary, map_first]
+        sorry
+        -- rw [LinearMap.ext_iff]
+        -- intro x
+        -- rw [LinearMap.restrict_apply]
+        -- simp
+      map_mul' := by
+        intro x y
+        sorry
+        -- simp [map_first]
+        -- rfl
+    }
+
+    let first_range := map_first_hom.range
+
+
+    let map_second (h: Subgroup.centralizer {g}) := h.val.val.val.toLin'.restrict
+      (p :=  ⨆ (i : { i : Module.End.Eigenvalues g.val.val.toLin' // i.val ≠ k }), Module.End.maxGenEigenspace g.val.val.toLin' i)
+      (q :=  ⨆ (i : { i : Module.End.Eigenvalues g.val.val.toLin' // i.val ≠ k }), Module.End.maxGenEigenspace g.val.val.toLin' i)
+      (by
+        intro x hx
+        sorry
+      )
+
+    let map_second_unitary (h: Subgroup.centralizer {g}): Matrix.unitaryGroup (Fin (n - d)) ℂ := {
+      val := by
+        let foo := (map_second h)
+        sorry
+      property := sorry
+    }
+
+    let map_second_hom: MonoidHom (Subgroup.centralizer {g}) _ := {
+      toFun := map_second_unitary
+      map_one' := by
+        simp [map_second_unitary, map_second]
+        sorry
+        -- rw [LinearMap.ext_iff]
+        -- intro x
+        -- rw [LinearMap.restrict_apply]
+        -- simp
+      map_mul' := by
+        intro x y
+        sorry
+        -- simp [map_first]
+        -- rfl
+    }
+
+    let first_iso := MonoidHom.ofInjective (f := map_first_hom) (by sorry)
+    let second_iso := MonoidHom.ofInjective (f := map_second_hom) (by sorry)
+    let prod_hom := MonoidHom.prod first_iso.toMonoidHom second_iso.toMonoidHom
+    let prod_iso := MulEquiv.ofBijective prod_hom (by
+      sorry
+    )
+
+
+    apply Nonempty.intro
+    exact {
+      a := Module.finrank ℂ (Module.End.genEigenspace g.val.val.toLin' k (Module.End.maxGenEigenspaceIndex g.val.val.toLin' k))
+      ha := by
+        rw [Nat.ne_zero_iff_zero_lt]
+        apply Module.End.pos_finrank_genEigenspace_of_hasEigenvalue hk
+        simp [Module.End.maxGenEigenspaceIndex]
+        sorry
+      A := _
+      B := _
+      iso := prod_iso
+
+    }
+
+
+  -- let f: Subgroup.centralizer {g} ≃* A × B := {
+
+  -- }
+  -- sorry
