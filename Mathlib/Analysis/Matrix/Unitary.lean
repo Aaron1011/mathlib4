@@ -29,7 +29,7 @@ lemma linearmap_comp_eq_mul {P: Type*} [AddCommMonoid P] [Module ℂ P] (a b: P 
 lemma linearmap_comp_toContinuousLinearMap {P: Type*} [AddCommGroup P] [Module ℂ P] [TopologicalSpace P] [IsTopologicalAddGroup P] [ContinuousSMul ℂ P] [T2Space P]  [FiniteDimensional ℂ P]  (a b: P →ₗ[ℂ] P):
   (a.comp b).toContinuousLinearMap = a.toContinuousLinearMap * b.toContinuousLinearMap := rfl
 
-set_option maxHeartbeats 300000 in
+set_option maxHeartbeats 800000 in
 set_option synthInstance.maxHeartbeats 40000 in
 lemma centralizer_iso {n: ℕ} [hn: NeZero n] (G: Subgroup (Matrix.unitaryGroup (Fin n) ℂ)) (g: G) (g_not: ∀ z: ℂ, g.val.val ≠ z • 1):
     Nonempty (IsoData g) := by
@@ -198,7 +198,12 @@ lemma centralizer_iso {n: ℕ} [hn: NeZero n] (G: Subgroup (Matrix.unitaryGroup 
             simp
         rw [← ContinuousLinearMap.norm_map_iff_adjoint_comp_self]
         intro x
-        sorry
+        simp
+        rw [← Matrix.toEuclideanLin_eq_toLin_orthonormal]
+        rw [Matrix.toEuclideanLin_apply]
+        . sorry
+        . exact LinearEquiv.injective LinearMap.toContinuousLinearMap
+        . sorry
         apply Unitary.mul_star_self_of_mem
         conv =>
           lhs
