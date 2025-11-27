@@ -96,8 +96,7 @@ lemma centralizer_iso {n: ℕ} [hn: NeZero n] (G: Subgroup (Matrix.unitaryGroup 
 
     rw [Module.End.mem_invtSubmodule_iff_forall_mem_of_mem] at other_invariant
 
-
-    let map_first (h: Subgroup.centralizer {g}) := h.val.val.val.toEuclideanLin.restrict (Module.End.mapsTo_genEigenspace_of_comm (f := g.val.val.toEuclideanLin) (g := h.val.val.val.toEuclideanLin) (by
+    have comm_g_h (h: Subgroup.centralizer {g}): Commute (Matrix.toEuclideanLin g.val.val) (Matrix.toEuclideanLin h.val.val) := by
       have foo := h.property
       rw [Subgroup.mem_centralizer_iff] at foo
       rw [commute_iff_eq]
@@ -108,6 +107,10 @@ lemma centralizer_iso {n: ℕ} [hn: NeZero n] (G: Subgroup (Matrix.unitaryGroup 
       simp only [LinearEquiv.trans_apply, Matrix.toLin'_mul] at foo
       unfold Matrix.toEuclideanLin
       exact foo
+
+
+    let map_first (h: Subgroup.centralizer {g}) := h.val.val.val.toEuclideanLin.restrict (Module.End.mapsTo_genEigenspace_of_comm (f := g.val.val.toEuclideanLin) (g := h.val.val.val.toEuclideanLin) (by
+      apply comm_g_h
     ) k ⊤)
 
     --let a := LinearMap.toMatrixOrthonormal (stdOrthonormalBasis ℂ _) (map_first 1)
@@ -221,7 +224,11 @@ lemma centralizer_iso {n: ℕ} [hn: NeZero n] (G: Subgroup (Matrix.unitaryGroup 
         simp only [LinearMap.coe_toContinuousLinearMap']
         conv =>
           intro x
-          rw [LinearMap.restrict_apply (by sorry)]
+          rw [LinearMap.restrict_apply (by
+            apply Module.End.mapsTo_genEigenspace_of_comm (by
+              apply comm_g_h
+            )
+          )]
           simp
           rw [← LinearMap.coe_toContinuousLinearMap']
 
