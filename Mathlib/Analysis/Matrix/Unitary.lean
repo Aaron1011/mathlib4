@@ -131,14 +131,23 @@ lemma centralizer_iso {n: ℕ} [hn: NeZero n] (G: Subgroup (Matrix.unitaryGroup 
           rhs
           -- TODO - why does this timeout when not inside 'conv'?
           rw [← LinearMap.toMatrix_adjoint]
+          arg 2
+          --rw [← LinearMap.star_eq_adjoint]
         rw [← LinearMap.toMatrix_mul]
         conv =>
           lhs
           rhs
           rhs
-          rw [← Matrix.toEuclideanLin_conjTranspose_eq_adjoint]
           arg 1
-          rw [Matrix.toEuclideanLin_eq_toLin_orthonormal]
+          --arg 1
+          --rw [Matrix.toEuclideanLin_eq_toLin_orthonormal]
+        -- conv =>
+        --   lhs
+        --   rhs
+        --   rhs
+        --   rw [← Matrix.toEuclideanLin_conjTranspose_eq_adjoint]
+        --   arg 1
+        --   rw [Matrix.toEuclideanLin_eq_toLin_orthonormal]
 
 
         conv =>
@@ -152,8 +161,21 @@ lemma centralizer_iso {n: ℕ} [hn: NeZero n] (G: Subgroup (Matrix.unitaryGroup 
         apply_fun Matrix.toLin (stdOrthonormalBasis _ _).toBasis (stdOrthonormalBasis _ _).toBasis
         simp
         conv =>
+          rhs
+          equals 1 =>
+            ext a
+            simp
+
+        conv =>
           lhs
           rw [← linearmap_comp_eq_mul]
+
+
+        apply Unitary.mul_star_self_of_mem
+        conv =>
+          lhs
+          rw [← linearmap_comp_eq_mul]
+
           rw [← Matrix.toLin_mul]
           -- rhs
 
