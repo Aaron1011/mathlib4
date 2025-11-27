@@ -30,7 +30,7 @@ lemma linearmap_comp_toContinuousLinearMap {P: Type*} [AddCommGroup P] [Module �
   (a.comp b).toContinuousLinearMap = a.toContinuousLinearMap * b.toContinuousLinearMap := rfl
 
 set_option maxHeartbeats 800000 in
-set_option synthInstance.maxHeartbeats 40000 in
+set_option synthInstance.maxHeartbeats 100000 in
 lemma centralizer_iso {n: ℕ} [hn: NeZero n] (G: Subgroup (Matrix.unitaryGroup (Fin n) ℂ)) (g: G) (g_not: ∀ z: ℂ, g.val.val ≠ z • 1):
     Nonempty (IsoData g) := by
 
@@ -190,26 +190,57 @@ lemma centralizer_iso {n: ℕ} [hn: NeZero n] (G: Subgroup (Matrix.unitaryGroup 
           equals 1 =>
             ext z
             simp
-        exact h_unitary
-        rw [LinearMap.ext_iff]
-        intro y
-        simp
-        rw [LinearMap.restrict_apply]
+        -- exact h_unitary
+        -- rw [LinearMap.ext_iff]
+        -- intro y
+        -- simp
+        -- rw [LinearMap.restrict_apply]
 
 
-        rw [← Matrix.toEuclideanLin_conjTranspose_eq_adjoint]
-        conv =>
-          lhs
-          rw [← linearmap_comp_eq_mul]
+        -- rw [← Matrix.toEuclideanLin_conjTranspose_eq_adjoint]
+        -- conv =>
+          --lhs
+          --rw [← linearmap_comp_eq_mul]
 
         apply_fun (fun f => LinearMap.toContinuousLinearMap f)
         simp [-EmbeddingLike.apply_eq_iff_eq]
         conv =>
           lhs
+          rw [← linearmap_comp_eq_mul]
           rw [linearmap_comp_toContinuousLinearMap]
           rw [ContinuousLinearMap.mul_def]
           lhs
           rw [LinearMap.adjoint_toContinuousLinearMap]
+
+        conv =>
+          rhs
+          equals 1 =>
+            ext z
+            simp
+        rw [← ContinuousLinearMap.norm_map_iff_adjoint_comp_self]
+        simp only [LinearMap.coe_toContinuousLinearMap']
+        conv =>
+          intro x
+          rw [LinearMap.restrict_apply (by sorry)]
+          simp
+          rw [← LinearMap.coe_toContinuousLinearMap']
+
+
+        apply_fun (fun f => LinearMap.toContinuousLinearMap f) at h_unitary
+        simp [-EmbeddingLike.apply_eq_iff_eq] at h_unitary
+        conv at h_unitary =>
+          lhs
+          rw [← linearmap_comp_eq_mul]
+          rw [linearmap_comp_toContinuousLinearMap]
+          rw [ContinuousLinearMap.mul_def]
+          lhs
+          rw [LinearMap.adjoint_toContinuousLinearMap]
+
+        rw [← ContinuousLinearMap.norm_map_iff_adjoint_comp_self] at h_unitary
+        intro x
+        specialize h_unitary x.val
+        exact h_unitary
+        rw [ContinuousLinearMap.norm_map_iff_adjoint_comp_self]
 
         -- conv =>
         --   lhs
