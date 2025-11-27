@@ -26,6 +26,9 @@ lemma diag_of_eigenspace_span {n: ℕ} [hn: NeZero n] (g: ((Fin n) → ℂ) →�
 
 lemma linearmap_comp_eq_mul {P: Type*} [AddCommMonoid P] [Module ℂ P] (a b: P →ₗ[ℂ] P): a.comp b = a * b := rfl
 
+lemma linearmap_comp_toContinuousLinearMap {P: Type*} [AddCommGroup P] [Module ℂ P] [TopologicalSpace P] [IsTopologicalAddGroup P] [ContinuousSMul ℂ P] [T2Space P]  [FiniteDimensional ℂ P]  (a b: P →ₗ[ℂ] P):
+  (a.comp b).toContinuousLinearMap = a.toContinuousLinearMap * b.toContinuousLinearMap := rfl
+
 set_option maxHeartbeats 300000 in
 set_option synthInstance.maxHeartbeats 40000 in
 lemma centralizer_iso {n: ℕ} [hn: NeZero n] (G: Subgroup (Matrix.unitaryGroup (Fin n) ℂ)) (g: G) (g_not: ∀ z: ℂ, g.val.val ≠ z • 1):
@@ -114,11 +117,11 @@ lemma centralizer_iso {n: ℕ} [hn: NeZero n] (G: Subgroup (Matrix.unitaryGroup 
       property := by
 
 
-        rw [Matrix.mem_unitaryGroup_iff]
+        rw [Matrix.mem_unitaryGroup_iff']
 
         conv =>
           lhs
-          rhs
+          lhs
           -- TODO - why does this timeout when not inside 'conv'?
           rw [Matrix.star_eq_conjTranspose]
         -- rw [← LinearMap.toMatrix_adjoint]
@@ -128,7 +131,7 @@ lemma centralizer_iso {n: ℕ} [hn: NeZero n] (G: Subgroup (Matrix.unitaryGroup 
         simp []
         conv =>
           lhs
-          rhs
+          lhs
           -- TODO - why does this timeout when not inside 'conv'?
           rw [← LinearMap.toMatrix_adjoint]
           arg 2
@@ -153,7 +156,7 @@ lemma centralizer_iso {n: ℕ} [hn: NeZero n] (G: Subgroup (Matrix.unitaryGroup 
         conv =>
           lhs
           rhs
-          arg 1
+          arg 2
           arg 1
           rw [Matrix.toEuclideanLin_eq_toLin_orthonormal]
 
@@ -170,7 +173,32 @@ lemma centralizer_iso {n: ℕ} [hn: NeZero n] (G: Subgroup (Matrix.unitaryGroup 
           lhs
           rw [← linearmap_comp_eq_mul]
 
+        apply_fun (fun f => LinearMap.toContinuousLinearMap f)
+        simp [-EmbeddingLike.apply_eq_iff_eq]
+        conv =>
+          lhs
+          rw [linearmap_comp_toContinuousLinearMap]
+          rw [ContinuousLinearMap.mul_def]
+          lhs
+          rw [LinearMap.adjoint_toContinuousLinearMap]
 
+        conv =>
+          lhs
+          lhs
+          arg 2
+          arg 2
+          arg 1
+          rw [Matrix.toEuclideanLin_eq_toLin_orthonormal]
+
+
+        conv =>
+          rhs
+          equals 1 =>
+            ext x
+            simp
+        rw [← ContinuousLinearMap.norm_map_iff_adjoint_comp_self]
+        intro x
+        sorry
         apply Unitary.mul_star_self_of_mem
         conv =>
           lhs
