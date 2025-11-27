@@ -172,6 +172,32 @@ lemma centralizer_iso {n: ℕ} [hn: NeZero n] (G: Subgroup (Matrix.unitaryGroup 
             ext a
             simp
 
+        simp [map_first]
+        have h_unitary := Unitary.star_mul_self_of_mem h.val.val.property
+        apply_fun Matrix.toEuclideanLin at h_unitary
+        rw [Matrix.toEuclideanLin_eq_toLin_orthonormal] at h_unitary
+        conv at h_unitary =>
+          lhs
+          equals (Matrix.toEuclideanLin (star h.val.val.val)) ∘ₗ (Matrix.toEuclideanLin (h.val.val.val)) =>
+            rw [Matrix.toEuclideanLin_eq_toLin_orthonormal]
+            rw [← Matrix.toLin_mul]
+        rw [← Matrix.toEuclideanLin_eq_toLin_orthonormal] at h_unitary
+        rw [Matrix.star_eq_conjTranspose] at h_unitary
+        rw [Matrix.toEuclideanLin_conjTranspose_eq_adjoint] at h_unitary
+        conv at h_unitary =>
+          rhs
+          rw [Matrix.toEuclideanLin_eq_toLin_orthonormal]
+          equals 1 =>
+            ext z
+            simp
+        exact h_unitary
+        rw [LinearMap.ext_iff]
+        intro y
+        simp
+        rw [LinearMap.restrict_apply]
+
+
+        rw [← Matrix.toEuclideanLin_conjTranspose_eq_adjoint]
         conv =>
           lhs
           rw [← linearmap_comp_eq_mul]
