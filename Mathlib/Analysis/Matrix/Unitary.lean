@@ -29,7 +29,7 @@ lemma linearmap_comp_eq_mul {P: Type*} [AddCommMonoid P] [Module ℂ P] (a b: P 
 lemma linearmap_comp_toContinuousLinearMap {P: Type*} [AddCommGroup P] [Module ℂ P] [TopologicalSpace P] [IsTopologicalAddGroup P] [ContinuousSMul ℂ P] [T2Space P]  [FiniteDimensional ℂ P]  (a b: P →ₗ[ℂ] P):
   (a.comp b).toContinuousLinearMap = a.toContinuousLinearMap * b.toContinuousLinearMap := rfl
 
-set_option maxHeartbeats 1200000 in
+set_option maxHeartbeats 3000000 in
 set_option synthInstance.maxHeartbeats 100000 in
 lemma centralizer_iso {n: ℕ} [hn: NeZero n] (G: Subgroup (Matrix.unitaryGroup (Fin n) ℂ)) (g: G) (g_not: ∀ z: ℂ, g.val.val ≠ z • 1):
     Nonempty (IsoData g) := by
@@ -116,8 +116,8 @@ lemma centralizer_iso {n: ℕ} [hn: NeZero n] (G: Subgroup (Matrix.unitaryGroup 
     --let a := LinearMap.toMatrixOrthonormal (stdOrthonormalBasis ℂ _) (map_first 1)
 
     --let d := Module.finrank ℂ (Module.End.genEigenspace g.val.val.toEuclideanLin k ⊤)
-    let d := (Module.finrank ℂ (EuclideanSpace ℂ (Fin (Module.finrank ℂ ↥((Module.End.genEigenspace (Matrix.toEuclideanLin g.val.val) k) ⊤)))))
-    let map_first_unitary (h: Subgroup.centralizer {g}): Matrix.unitaryGroup (Fin _) ℂ := {
+    let d := (Module.finrank ℂ ↥((Module.End.genEigenspace (Matrix.toEuclideanLin g.val.val) k) ⊤))
+    let map_first_unitary (h: Subgroup.centralizer {g}): Matrix.unitaryGroup (Fin d) ℂ := {
       val := LinearMap.toMatrixOrthonormal (stdOrthonormalBasis ℂ _) (map_first h)
       property := by
 
@@ -256,6 +256,7 @@ lemma centralizer_iso {n: ℕ} [hn: NeZero n] (G: Subgroup (Matrix.unitaryGroup 
           simpa using hxy
     }
 
+
     let map_first_hom: MonoidHom (Subgroup.centralizer {g}) _ := {
       toFun := map_first_unitary
       map_one' := by
@@ -277,6 +278,14 @@ lemma centralizer_iso {n: ℕ} [hn: NeZero n] (G: Subgroup (Matrix.unitaryGroup 
           simp
           rw [LinearMap.ext_iff]
           intro a
+          rw [← LinearMap.toMatrix_mul]
+          simp
+          simp_rw [Matrix.toEuclideanLin_eq_toLin_orthonormal]
+          conv =>
+            lhs
+            arg 1
+            arg 1
+
           sorry
         . intro x y hxy
           simpa using hxy
@@ -316,16 +325,25 @@ lemma centralizer_iso {n: ℕ} [hn: NeZero n] (G: Subgroup (Matrix.unitaryGroup 
         -- rfl
     }
 
-    let first_iso := MonoidHom.ofInjective (f := map_first_hom) (by sorry)
-    let second_iso := MonoidHom.ofInjective (f := map_second_hom) (by sorry)
-    let prod_hom := MonoidHom.prod first_iso.toMonoidHom second_iso.toMonoidHom
+    -- let first_iso := MonoidHom.ofInjective (f := map_first_hom) (by
+    --   simp [map_first_hom, map_first_unitary]
+    --   intro x y hxy
+    --   simp at hxy
+    --   simp [map_first] at hxy
+
+    -- )
+    -- let second_iso := MonoidHom.ofInjective (f := map_second_hom) (by sorry)
+    let prod_hom := MonoidHom.prod map_first_hom.rangeRestrict map_second_hom.rangeRestrict
     let prod_iso := MulEquiv.ofBijective prod_hom (by
       unfold Function.Bijective
       refine ⟨?_, ?_⟩
       .
         simp [prod_hom]
         intro x y hxy
-        simpa using hxy
+        simp at hxy
+        obtain ⟨first_eq, second_eq⟩ := hxy
+        simp [map_first_hom, map_first_unitary, map_first] at first_eq
+        sorry
       .
         intro a
         sorry
@@ -334,16 +352,16 @@ lemma centralizer_iso {n: ℕ} [hn: NeZero n] (G: Subgroup (Matrix.unitaryGroup 
 
     apply Nonempty.intro
     exact {
-      a := Module.finrank ℂ (Module.End.genEigenspace g.val.val.toLin' k (Module.End.maxGenEigenspaceIndex g.val.val.toLin' k))
+      a := d
       ha := by
-        rw [Nat.ne_zero_iff_zero_lt]
-        apply Module.End.pos_finrank_genEigenspace_of_hasEigenvalue hk
-        simp [Module.End.maxGenEigenspaceIndex]
         sorry
+        -- rw [Nat.ne_zero_iff_zero_lt]
+        -- apply Module.End.pos_finrank_genEigenspace_of_hasEigenvalue hk
+        -- simp [Module.End.maxGenEigenspaceIndex]
+        -- sorry
       A := _
       B := _
       iso := prod_iso
-
     }
 
 
