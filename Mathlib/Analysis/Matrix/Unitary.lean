@@ -24,6 +24,10 @@ lemma diag_of_eigenspace_span {n: ℕ} [hn: NeZero n] (g: ((Fin n) → ℂ) →�
   rw [Module.End.mem_eigenspace_iff] at x_mem
   exact x_mem
 
+lemma linearmap_comp_eq_mul {P: Type*} [AddCommMonoid P] [Module ℂ P] (a b: P →ₗ[ℂ] P): a.comp b = a * b := rfl
+
+set_option maxHeartbeats 300000 in
+set_option synthInstance.maxHeartbeats 40000 in
 lemma centralizer_iso {n: ℕ} [hn: NeZero n] (G: Subgroup (Matrix.unitaryGroup (Fin n) ℂ)) (g: G) (g_not: ∀ z: ℂ, g.val.val ≠ z • 1):
     Nonempty (IsoData g) := by
 
@@ -90,25 +94,74 @@ lemma centralizer_iso {n: ℕ} [hn: NeZero n] (G: Subgroup (Matrix.unitaryGroup 
     rw [Module.End.mem_invtSubmodule_iff_forall_mem_of_mem] at other_invariant
 
 
-    let map_first (h: Subgroup.centralizer {g}) := h.val.val.val.toLin'.restrict (Module.End.mapsTo_genEigenspace_of_comm (f := g.val.val.toLin') (g := h.val.val.val.toLin') (by
+    let map_first (h: Subgroup.centralizer {g}) := h.val.val.val.toEuclideanLin.restrict (Module.End.mapsTo_genEigenspace_of_comm (f := g.val.val.toEuclideanLin) (g := h.val.val.val.toEuclideanLin) (by
       have foo := h.property
       rw [Subgroup.mem_centralizer_iff] at foo
       rw [commute_iff_eq]
       simp at foo
-      apply_fun (fun m => m.val.val.toLin') at foo
-      simp at foo
+      apply_fun (fun m => m.val.val.toEuclideanLin) at foo
+      simp only [Subgroup.coe_mul, Submonoid.coe_mul] at foo
+      unfold Matrix.toEuclideanLin at foo
+      simp only [LinearEquiv.trans_apply, Matrix.toLin'_mul] at foo
+      unfold Matrix.toEuclideanLin
       exact foo
     ) k ⊤)
 
-    let d := Module.finrank ℂ (Module.End.genEigenspace g.val.val.toLin' k ⊤)
-
+    --let d := Module.finrank ℂ (Module.End.genEigenspace g.val.val.toEuclideanLin k ⊤)
+    let d := (Module.finrank ℂ (EuclideanSpace ℂ (Fin (Module.finrank ℂ ↥((Module.End.genEigenspace (Matrix.toEuclideanLin g.val.val) k) ⊤)))))
     let map_first_unitary (h: Subgroup.centralizer {g}): Matrix.unitaryGroup (Fin d) ℂ := {
-      val := LinearMap.toMatrix (Module.finBasisOfFinrankEq _ _ rfl) (Module.finBasisOfFinrankEq _ _ rfl) (map_first h)
+      val := (LinearMap.toMatrix (Module.finBasisOfFinrankEq _ _ rfl) (Module.finBasisOfFinrankEq _ _ rfl) (map_first h)).toEuclideanLin.toMatrixOrthonormal (stdOrthonormalBasis _ _)
       property := by
+
+
         rw [Matrix.mem_unitaryGroup_iff]
-        rw [Matrix.star_eq_conjTranspose]
-        rw [← LinearMap.toMatrix_adjoint]
+
+        conv =>
+          lhs
+          rhs
+          -- TODO - why does this timeout when not inside 'conv'?
+          rw [Matrix.star_eq_conjTranspose]
+        -- rw [← LinearMap.toMatrix_adjoint]
+        -- simp
+
+        simp only [LinearMap.toMatrixOrthonormal_apply]
+        simp []
+        conv =>
+          lhs
+          rhs
+          -- TODO - why does this timeout when not inside 'conv'?
+          rw [← LinearMap.toMatrix_adjoint]
+        rw [← LinearMap.toMatrix_mul]
+        conv =>
+          lhs
+          rhs
+          rhs
+          rw [← Matrix.toEuclideanLin_conjTranspose_eq_adjoint]
+          arg 1
+          rw [Matrix.toEuclideanLin_eq_toLin_orthonormal]
+
+
+        conv =>
+          lhs
+          rhs
+          arg 1
+          arg 1
+          rw [Matrix.toEuclideanLin_eq_toLin_orthonormal]
+
+
+        apply_fun Matrix.toLin (stdOrthonormalBasis _ _).toBasis (stdOrthonormalBasis _ _).toBasis
         simp
+        conv =>
+          lhs
+          rw [← linearmap_comp_eq_mul]
+          rw [← Matrix.toLin_mul]
+          -- rhs
+
+          -- rw [← Matrix.toLin_mul]
+          -- rw [← LinearMap.toMatrix_mul]
+
+        apply_fun LinearMap.toMatrix (stdOrthonormalBasis _ _).toBasis (stdOrthonormalBasis _ _).toBasis
+        simp [LinearMap.toMatrix_id]
         sorry
     }
 
