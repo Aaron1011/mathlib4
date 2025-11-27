@@ -100,13 +100,16 @@ lemma centralizer_iso {n: ℕ} [hn: NeZero n] (G: Subgroup (Matrix.unitaryGroup 
       exact foo
     ) k ⊤)
 
-    let d := Module.finrank ℂ (Module.End.genEigenspace g.val.val.toLin' k (Module.End.maxGenEigenspaceIndex g.val.val.toLin' k))
+    let d := Module.finrank ℂ (Module.End.genEigenspace g.val.val.toLin' k ⊤)
 
     let map_first_unitary (h: Subgroup.centralizer {g}): Matrix.unitaryGroup (Fin d) ℂ := {
-      val := by
-        let foo := (map_first h)
+      val := LinearMap.toMatrix (Module.finBasisOfFinrankEq _ _ rfl) (Module.finBasisOfFinrankEq _ _ rfl) (map_first h)
+      property := by
+        rw [Matrix.mem_unitaryGroup_iff]
+        rw [Matrix.star_eq_conjTranspose]
+        rw [← LinearMap.toMatrix_adjoint]
+        simp
         sorry
-      property := sorry
     }
 
     let map_first_hom: MonoidHom (Subgroup.centralizer {g}) _ := {
@@ -163,7 +166,15 @@ lemma centralizer_iso {n: ℕ} [hn: NeZero n] (G: Subgroup (Matrix.unitaryGroup 
     let second_iso := MonoidHom.ofInjective (f := map_second_hom) (by sorry)
     let prod_hom := MonoidHom.prod first_iso.toMonoidHom second_iso.toMonoidHom
     let prod_iso := MulEquiv.ofBijective prod_hom (by
-      sorry
+      unfold Function.Bijective
+      refine ⟨?_, ?_⟩
+      .
+        simp [prod_hom]
+        intro x y hxy
+        simpa using hxy
+      .
+        intro a
+        sorry
     )
 
 
