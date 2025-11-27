@@ -29,7 +29,7 @@ lemma linearmap_comp_eq_mul {P: Type*} [AddCommMonoid P] [Module ℂ P] (a b: P 
 lemma linearmap_comp_toContinuousLinearMap {P: Type*} [AddCommGroup P] [Module ℂ P] [TopologicalSpace P] [IsTopologicalAddGroup P] [ContinuousSMul ℂ P] [T2Space P]  [FiniteDimensional ℂ P]  (a b: P →ₗ[ℂ] P):
   (a.comp b).toContinuousLinearMap = a.toContinuousLinearMap * b.toContinuousLinearMap := rfl
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 1200000 in
 set_option synthInstance.maxHeartbeats 100000 in
 lemma centralizer_iso {n: ℕ} [hn: NeZero n] (G: Subgroup (Matrix.unitaryGroup (Fin n) ℂ)) (g: G) (g_not: ∀ z: ℂ, g.val.val ≠ z • 1):
     Nonempty (IsoData g) := by
@@ -260,16 +260,26 @@ lemma centralizer_iso {n: ℕ} [hn: NeZero n] (G: Subgroup (Matrix.unitaryGroup 
       toFun := map_first_unitary
       map_one' := by
         simp [map_first_unitary, map_first]
-        sorry
-        -- rw [LinearMap.ext_iff]
-        -- intro x
-        -- rw [LinearMap.restrict_apply]
-        -- simp
+        apply_fun Matrix.toLin (stdOrthonormalBasis ℂ _).toBasis (stdOrthonormalBasis ℂ _).toBasis
+        .
+          simp
+          simp_rw [Matrix.toEuclideanLin_eq_toLin_orthonormal]
+          simp
+          ext a
+          simp
+        . intro x y hxy
+          simpa using hxy
       map_mul' := by
         intro x y
-        sorry
-        -- simp [map_first]
-        -- rfl
+        simp [map_first_unitary, map_first]
+        apply_fun Matrix.toLin (stdOrthonormalBasis ℂ _).toBasis (stdOrthonormalBasis ℂ _).toBasis
+        .
+          simp
+          rw [LinearMap.ext_iff]
+          intro a
+          sorry
+        . intro x y hxy
+          simpa using hxy
     }
 
     let first_range := map_first_hom.range
