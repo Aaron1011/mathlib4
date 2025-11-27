@@ -110,10 +110,12 @@ lemma centralizer_iso {n: ℕ} [hn: NeZero n] (G: Subgroup (Matrix.unitaryGroup 
       exact foo
     ) k ⊤)
 
+    --let a := LinearMap.toMatrixOrthonormal (stdOrthonormalBasis ℂ _) (map_first 1)
+
     --let d := Module.finrank ℂ (Module.End.genEigenspace g.val.val.toEuclideanLin k ⊤)
     let d := (Module.finrank ℂ (EuclideanSpace ℂ (Fin (Module.finrank ℂ ↥((Module.End.genEigenspace (Matrix.toEuclideanLin g.val.val) k) ⊤)))))
-    let map_first_unitary (h: Subgroup.centralizer {g}): Matrix.unitaryGroup (Fin d) ℂ := {
-      val := (LinearMap.toMatrix (Module.finBasisOfFinrankEq _ _ rfl) (Module.finBasisOfFinrankEq _ _ rfl) (map_first h)).toEuclideanLin.toMatrixOrthonormal (stdOrthonormalBasis _ _)
+    let map_first_unitary (h: Subgroup.centralizer {g}): Matrix.unitaryGroup (Fin _) ℂ := {
+      val := LinearMap.toMatrixOrthonormal (stdOrthonormalBasis ℂ _) (map_first h)
       property := by
 
 
@@ -153,16 +155,17 @@ lemma centralizer_iso {n: ℕ} [hn: NeZero n] (G: Subgroup (Matrix.unitaryGroup 
         --   rw [Matrix.toEuclideanLin_eq_toLin_orthonormal]
 
 
-        conv =>
-          lhs
-          rhs
-          arg 2
-          arg 1
-          rw [Matrix.toEuclideanLin_eq_toLin_orthonormal]
+        -- conv =>
+        --   lhs
+        --   rhs
+        --   arg 2
+        --   arg 1
+        --   rw [Matrix.toEuclideanLin_eq_toLin_orthonormal]
 
 
-        apply_fun Matrix.toLin (stdOrthonormalBasis _ _).toBasis (stdOrthonormalBasis _ _).toBasis
-        simp
+        apply_fun Matrix.toLin (stdOrthonormalBasis ℂ _).toBasis (stdOrthonormalBasis ℂ _).toBasis
+        rw [Matrix.toLin_toMatrix]
+        rw [Matrix.toLin_one]
         conv =>
           rhs
           equals 1 =>
@@ -182,13 +185,13 @@ lemma centralizer_iso {n: ℕ} [hn: NeZero n] (G: Subgroup (Matrix.unitaryGroup 
           lhs
           rw [LinearMap.adjoint_toContinuousLinearMap]
 
-        conv =>
-          lhs
-          lhs
-          arg 2
-          arg 2
-          arg 1
-          rw [Matrix.toEuclideanLin_eq_toLin_orthonormal]
+        -- conv =>
+        --   lhs
+        --   lhs
+        --   arg 2
+        --   arg 2
+        --   arg 1
+        --   rw [Matrix.toEuclideanLin_eq_toLin_orthonormal]
 
 
         conv =>
@@ -198,7 +201,9 @@ lemma centralizer_iso {n: ℕ} [hn: NeZero n] (G: Subgroup (Matrix.unitaryGroup 
             simp
         rw [← ContinuousLinearMap.norm_map_iff_adjoint_comp_self]
         intro x
-        simp
+        simp [map_first]
+        rw [Matrix.toEuclideanLin_apply]
+
         rw [← Matrix.toEuclideanLin_eq_toLin_orthonormal]
         rw [Matrix.toEuclideanLin_apply]
         . sorry
