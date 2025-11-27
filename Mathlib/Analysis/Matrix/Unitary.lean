@@ -230,56 +230,23 @@ lemma centralizer_iso {n: ℕ} [hn: NeZero n] (G: Subgroup (Matrix.unitaryGroup 
         simp [-EmbeddingLike.apply_eq_iff_eq] at h_unitary
         conv at h_unitary =>
           lhs
-          rw [← linearmap_comp_eq_mul]
           rw [linearmap_comp_toContinuousLinearMap]
           rw [ContinuousLinearMap.mul_def]
           lhs
           rw [LinearMap.adjoint_toContinuousLinearMap]
 
-        rw [← ContinuousLinearMap.norm_map_iff_adjoint_comp_self] at h_unitary
-        intro x
-        specialize h_unitary x.val
-        exact h_unitary
-        rw [ContinuousLinearMap.norm_map_iff_adjoint_comp_self]
-
-        -- conv =>
-        --   lhs
-        --   lhs
-        --   arg 2
-        --   arg 2
-        --   arg 1
-        --   rw [Matrix.toEuclideanLin_eq_toLin_orthonormal]
-
-
-        conv =>
+        conv at h_unitary =>
           rhs
           equals 1 =>
             ext x
             simp
-        rw [← ContinuousLinearMap.norm_map_iff_adjoint_comp_self]
+        rw [← ContinuousLinearMap.norm_map_iff_adjoint_comp_self] at h_unitary
         intro x
-        simp [map_first]
-        rw [Matrix.toEuclideanLin_apply]
-
-        rw [← Matrix.toEuclideanLin_eq_toLin_orthonormal]
-        rw [Matrix.toEuclideanLin_apply]
-        . sorry
+        specialize h_unitary x.val
+        exact h_unitary
         . exact LinearEquiv.injective LinearMap.toContinuousLinearMap
-        . sorry
-        apply Unitary.mul_star_self_of_mem
-        conv =>
-          lhs
-          rw [← linearmap_comp_eq_mul]
-
-          rw [← Matrix.toLin_mul]
-          -- rhs
-
-          -- rw [← Matrix.toLin_mul]
-          -- rw [← LinearMap.toMatrix_mul]
-
-        apply_fun LinearMap.toMatrix (stdOrthonormalBasis _ _).toBasis (stdOrthonormalBasis _ _).toBasis
-        simp [LinearMap.toMatrix_id]
-        sorry
+        . intro x y hxy
+          simpa using hxy
     }
 
     let map_first_hom: MonoidHom (Subgroup.centralizer {g}) _ := {
