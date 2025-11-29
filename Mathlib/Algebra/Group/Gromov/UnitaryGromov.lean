@@ -5229,6 +5229,11 @@ lemma central_trivial_virtually_abelian (n : ℕ) (hn : 2 ≤ n) (G : Subgroup (
 
 end HnEpsData
 
+lemma finite_index_comap {A B: Type*} [Group A] [Group B] (f: A →* B) (hf: Function.Injective f) (H: Subgroup B) (H_index: H.FiniteIndex): (Subgroup.comap f H).FiniteIndex := by
+  rw [finiteIndex_iff_finite_quotient] at H_index
+  rw [← Set.finite_univ_iff] at H_index
+  apply Subgroup.finiteIndex_of_leftCoset_cover_const
+  sorry
 
 
 
@@ -5656,6 +5661,8 @@ lemma compact_lie_virtually_abelian (n : ℕ) (hn : n ≠ 0) (G : Subgroup (Matr
           simp [central_hom] at hxy
           rw [Function.Injective.eq_iff] at hxy
           .
+            rw [Subtype.ext_iff] at hxy
+            simp at hxy
             exact hxy
           . apply data.iso_inj
 
@@ -5687,6 +5694,9 @@ lemma compact_lie_virtually_abelian (n : ℕ) (hn : n ≠ 0) (G : Subgroup (Matr
         .
           simp [G_1]
           rw [Subgroup.comap_comap]
+          rw [← ne_eq]
+          rw [← Subgroup.finiteIndex_iff]
+          apply Subgroup.finiteIndex_of_leftCoset_cover_const
           rw [Subgroup.index_comap]
           --rw [Subgroup.relIndex_ne_zero]
           --rw [Subgroup.index_comap]
