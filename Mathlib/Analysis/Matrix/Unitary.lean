@@ -575,7 +575,8 @@ lemma centralizer_iso {n: ℕ} [hn: NeZero n] (G: Subgroup (Matrix.unitaryGroup 
           map_smul' := by simp
         }
 
-        let new := LinearMap.ofIsCompl a_b_compl map_first_x_new map_second_y_new
+        let x_new := LinearMap.ofIsCompl a_b_compl map_first_x_new (LinearMap.id)
+        let y_new := LinearMap.ofIsCompl a_b_compl LinearMap.id map_second_y_new
         use ⟨⟨(Matrix.toEuclideanLin.symm new), (by
           simp [Matrix.mem_unitaryGroup_iff']
           apply_fun (fun f => Matrix.toEuclideanLin f)
@@ -620,27 +621,27 @@ lemma centralizer_iso {n: ℕ} [hn: NeZero n] (G: Subgroup (Matrix.unitaryGroup 
 
             -- Submodule.existsUnique_add_of_isCompl
             sorry
-            apply_fun (fun f => LinearMap.toContinuousLinearMap f) at h_unitary
-            simp [-EmbeddingLike.apply_eq_iff_eq] at h_unitary
-            conv at h_unitary =>
-              lhs
-              rw [linearmap_comp_toContinuousLinearMap]
-              rw [ContinuousLinearMap.mul_def]
-              lhs
-              rw [LinearMap.adjoint_toContinuousLinearMap]
+            -- apply_fun (fun f => LinearMap.toContinuousLinearMap f) at h_unitary
+            -- simp [-EmbeddingLike.apply_eq_iff_eq] at h_unitary
+            -- conv at h_unitary =>
+            --   lhs
+            --   rw [linearmap_comp_toContinuousLinearMap]
+            --   rw [ContinuousLinearMap.mul_def]
+            --   lhs
+            --   rw [LinearMap.adjoint_toContinuousLinearMap]
 
-            conv at h_unitary =>
-              rhs
-              equals 1 =>
-                ext x
-                simp
-            rw [← ContinuousLinearMap.norm_map_iff_adjoint_comp_self] at h_unitary
-            intro x
-            specialize h_unitary x.val
-            exact h_unitary
-            . exact LinearEquiv.injective LinearMap.toContinuousLinearMap
-            . intro x y hxy
-              simpa using hxy
+            -- conv at h_unitary =>
+            --   rhs
+            --   equals 1 =>
+            --     ext x
+            --     simp
+            -- rw [← ContinuousLinearMap.norm_map_iff_adjoint_comp_self] at h_unitary
+            -- intro x
+            -- specialize h_unitary x.val
+            -- exact h_unitary
+            -- . exact LinearEquiv.injective LinearMap.toContinuousLinearMap
+            -- . intro x y hxy
+            --   simpa using hxy
 
 
 
