@@ -76,6 +76,7 @@ theorem leftCoset_cover_const_iff_surjOn :
   simp [Set.eq_univ_iff_forall, mem_leftCoset_iff, Set.SurjOn,
     QuotientGroup.forall_mk, QuotientGroup.eq]
 
+
 variable (hcovers : ⋃ i ∈ s, g i • (H : Set G) = Set.univ)
 include hcovers
 
@@ -115,6 +116,30 @@ theorem pairwiseDisjoint_leftCoset_cover_const_of_index_eq (hind : H.index = s.c
   · simp only [Fintype.card_coe, ← hind, index_eq_card, Nat.card_eq_fintype_card]
 
 end leftCoset_cover_const
+
+section rightCoset_cover_const
+
+variable {ι : Type*} {s : Finset ι} {H : Subgroup G} {g : ι → G}
+
+
+@[to_additive]
+theorem rightCoset_cover_const_iff_surjOn :
+    ⋃ i ∈ s, (MulOpposite.op (g i)) • (H : Set G) = Set.univ ↔ Set.SurjOn ((fun a => Quotient.mk _ (g a)) : ι → (Quotient (QuotientGroup.rightRel H)))  s Set.univ := by
+  -- QuotientGroup.quotientRightRelEquivQuotientLeftRel
+  simp [Set.eq_univ_iff_forall, mem_rightCoset_iff, Set.SurjOn,
+    Quotient.forall, QuotientGroup.rightRel_apply]
+
+variable (hcovers : ⋃ i ∈ s, (MulOpposite.op (g i)) • (H : Set G) = Set.univ)
+include hcovers
+
+@[to_additive]
+theorem finiteIndex_of_rightCoset_cover_const : H.FiniteIndex := by
+  simp_rw [rightCoset_cover_const_iff_surjOn] at hcovers
+  have := Set.finite_univ_iff.mp <| Set.Finite.of_surjOn _ hcovers s.finite_toSet
+  rw [Equiv.finite_iff (QuotientGroup.quotientRightRelEquivQuotientLeftRel _)] at this
+  exact H.finiteIndex_of_finite_quotient
+
+end rightCoset_cover_const
 
 section
 
