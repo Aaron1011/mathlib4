@@ -93,5 +93,3 @@ lemma finite_of_nilpotent_fg_order {G: Type*} [Group G] [Group.FG G] [Group.IsNi
   · infer_instance
 
 -/
-lemma finite_of_nilpotent_fg_order {G: Type*} [Group G] [Group.FG G] [Group.IsNilpotent G] (m: ℕ) (hg: ∀ g : G, g ≠ 1 → orderOf g = m): Finite G := by
-  sorry

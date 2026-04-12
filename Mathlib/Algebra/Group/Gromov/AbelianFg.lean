@@ -187,7 +187,8 @@ lemma new_subgroup_fg_of_nilpotent_fg {G: Type*} [Group G] [hG: Group.IsNilpoten
 
 
 
-    have prev := ih (G := (H ⧸ (Subgroup.center H))) ⊤
+    --have prev := ih (G := (H ⧸ (Subgroup.center H))) ⊤
+    sorry
 
 
 
@@ -219,12 +220,12 @@ lemma subgroup_fg_of_nilpotent_fg {G: Type*} [Group G] [hG: Group.IsNilpotent G]
       sorry
     . simp
 
-    have a_fg := h_quot ⊤
-    rw [← Group.fg_def] at a_fg
+    -- have a_fg := h_quot ⊤
+    -- rw [← Group.fg_def] at a_fg
 
 
 
 
-    sorry
-    apply fg_of_quot (H := (Subgroup.center A))
-    sorry
+    -- sorry
+    -- apply fg_of_quot (H := (Subgroup.center A))
+    -- sorry
