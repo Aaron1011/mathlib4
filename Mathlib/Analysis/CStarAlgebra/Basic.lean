@@ -3,15 +3,17 @@ Copyright (c) 2021 Frédéric Dupuis. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Frédéric Dupuis
 -/
-import Mathlib.Analysis.Normed.Group.Hom
-import Mathlib.Analysis.Normed.Module.Basic
-import Mathlib.Analysis.Normed.Operator.LinearIsometry
-import Mathlib.Algebra.Star.Pi
-import Mathlib.Algebra.Star.SelfAdjoint
-import Mathlib.Algebra.Star.Subalgebra
-import Mathlib.Algebra.Star.Unitary
-import Mathlib.Data.Real.Star
-import Mathlib.Topology.Algebra.Module.Star
+module
+
+public import Mathlib.Analysis.Normed.Group.Hom
+public import Mathlib.Analysis.Normed.Module.Basic
+public import Mathlib.Analysis.Normed.Operator.LinearIsometry
+public import Mathlib.Algebra.Star.Pi
+public import Mathlib.Algebra.Star.SelfAdjoint
+public import Mathlib.Algebra.Star.Subalgebra
+public import Mathlib.Algebra.Star.Unitary
+public import Mathlib.Data.Real.Star
+public import Mathlib.Topology.Algebra.Module.Star
 
 /-!
 # Normed star rings and algebras
@@ -31,6 +33,8 @@ Note that the type classes corresponding to C⋆-algebras are defined in
   definition of C*-algebras in some sources (e.g. Wikipedia).
 
 -/
+
+@[expose] public section
 
 assert_not_exists ContinuousLinearMap.hasOpNorm
 
@@ -220,17 +224,8 @@ theorem norm_of_mem_unitary [Nontrivial E] {U : E} (hU : U ∈ unitary E) : ‖U
 
 @[simp]
 theorem norm_coe_unitary_mul (U : unitary E) (A : E) : ‖(U : E) * A‖ = ‖A‖ := by
-  nontriviality E
-  refine le_antisymm ?_ ?_
-  · calc
-      _ ≤ ‖(U : E)‖ * ‖A‖ := norm_mul_le _ _
-      _ = ‖A‖ := by rw [norm_coe_unitary, one_mul]
-  · calc
-      _ = ‖(U : E)⋆ * U * A‖ := by rw [Unitary.coe_star_mul_self U, one_mul]
-      _ ≤ ‖(U : E)⋆‖ * ‖(U : E) * A‖ := by
-        rw [mul_assoc]
-        exact norm_mul_le _ _
-      _ = ‖(U : E) * A‖ := by rw [norm_star, norm_coe_unitary, one_mul]
+  rw [← sq_eq_sq₀ (norm_nonneg _) (norm_nonneg _)]
+  simp [sq, ← CStarRing.norm_star_mul_self, mul_assoc, ← mul_assoc (U : E)⋆]
 
 @[simp]
 theorem norm_unitary_smul (U : unitary E) (A : E) : ‖U • A‖ = ‖A‖ :=
@@ -240,12 +235,8 @@ theorem norm_mem_unitary_mul {U : E} (A : E) (hU : U ∈ unitary E) : ‖U * A�
   norm_coe_unitary_mul ⟨U, hU⟩ A
 
 @[simp]
-theorem norm_mul_coe_unitary (A : E) (U : unitary E) : ‖A * U‖ = ‖A‖ :=
-  calc
-    _ = ‖((U : E)⋆ * A⋆)⋆‖ := by simp only [star_star, star_mul]
-    _ = ‖(U : E)⋆ * A⋆‖ := by rw [norm_star]
-    _ = ‖A⋆‖ := norm_mem_unitary_mul (star A) (Unitary.star_mem U.prop)
-    _ = ‖A‖ := norm_star _
+theorem norm_mul_coe_unitary (A : E) (U : unitary E) : ‖A * U‖ = ‖A‖ := by
+  simpa [← norm_star (A * U)] using norm_coe_unitary_mul (star U) (star A)
 
 theorem norm_mul_mem_unitary (A : E) {U : E} (hU : U ∈ unitary E) : ‖A * U‖ = ‖A‖ :=
   norm_mul_coe_unitary A ⟨U, hU⟩
@@ -273,6 +264,12 @@ theorem IsSelfAdjoint.norm_pow_two_pow {x : E} (hx : IsSelfAdjoint x) (n : ℕ) 
   congr($(hx.nnnorm_pow_two_pow n))
 
 end SelfAdjoint
+
+theorem IsStarProjection.norm_le [NonUnitalNormedRing E] [StarRing E] [CStarRing E]
+    (e : E) (he : IsStarProjection e) : ‖e‖ ≤ 1 := by
+  suffices ‖e‖ * (‖e‖ - 1) = 0 by grind [sub_eq_zero]
+  simp [mul_sub, ← CStarRing.norm_star_mul_self, he.isSelfAdjoint.star_eq, he.isIdempotentElem.eq]
+
 section starₗᵢ
 
 variable [CommSemiring 𝕜] [StarRing 𝕜]
@@ -302,9 +299,9 @@ end starₗᵢ
 
 namespace StarSubalgebra
 
-instance toNormedAlgebra {𝕜 A : Type*} [NormedField 𝕜] [StarRing 𝕜] [SeminormedRing A] [StarRing A]
-    [NormedAlgebra 𝕜 A] [StarModule 𝕜 A] (S : StarSubalgebra 𝕜 A) : NormedAlgebra 𝕜 S :=
-  NormedAlgebra.induced 𝕜 S A S.subtype
+example {𝕜 A : Type*} [NormedField 𝕜] [StarRing 𝕜] [SeminormedRing A] [StarRing A]
+    [NormedAlgebra 𝕜 A] [StarModule 𝕜 A] (S : StarSubalgebra 𝕜 A) :
+    NormedAlgebra 𝕜 S := by infer_instance
 
 instance to_cstarRing {R A} [CommRing R] [StarRing R] [NormedRing A] [StarRing A] [CStarRing A]
     [Algebra R A] [StarModule R A] (S : StarSubalgebra R A) : CStarRing S where

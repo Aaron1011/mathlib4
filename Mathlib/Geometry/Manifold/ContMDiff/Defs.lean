@@ -3,8 +3,10 @@ Copyright (c) 2020 Sébastien Gouëzel. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Sébastien Gouëzel, Floris van Doorn
 -/
-import Mathlib.Geometry.Manifold.IsManifold.ExtChartAt
-import Mathlib.Geometry.Manifold.LocalInvariantProperties
+module
+
+public import Mathlib.Geometry.Manifold.IsManifold.ExtChartAt
+public import Mathlib.Geometry.Manifold.LocalInvariantProperties
 
 /-!
 # `C^n` functions between manifolds
@@ -43,6 +45,8 @@ follow definitionally the setup of local invariant properties. Still, we recast 
 in terms of extended charts in `contMDiffOn_iff` and `contMDiff_iff`.
 -/
 
+@[expose] public section
+
 
 open Set Function Filter ChartedSpace IsManifold
 
@@ -69,9 +73,12 @@ variable {𝕜 : Type*} [NontriviallyNormedField 𝕜]
   {e' : OpenPartialHomeomorph M' H'} {f f₁ : M → M'} {s s₁ t : Set M} {x : M} {m n : WithTop ℕ∞}
 
 variable (I I') in
-/-- Property in the model space of a model with corners of being `C^n` within at set at a point,
+/-- Property in the model space of a model with corners of being `C^n` within a set at a point,
 when read in the model vector space. This property will be lifted to manifolds to define `C^n`
-functions between manifolds. -/
+functions between manifolds.
+The parameter `n` belongs to `WithTop ℕ∞`, i.e., it can be a natural number, `∞`, or `ω`
+(when the `ContDiff` scope is open), where `C^ω` corresponds to analytic functions.
+-/
 def ContDiffWithinAtProp (n : WithTop ℕ∞) (f : H → H') (s : Set H) (x : H) : Prop :=
   ContDiffWithinAt 𝕜 n (I' ∘ f ∘ I.symm) (I.symm ⁻¹' s ∩ range I) (I x)
 
@@ -156,14 +163,18 @@ theorem contDiffWithinAtProp_id (x : H) : ContDiffWithinAtProp I I n id univ x :
 variable (I I') in
 /-- A function is `n` times continuously differentiable within a set at a point in a manifold if
 it is continuous and it is `n` times continuously differentiable in this set around this point, when
-read in the preferred chart at this point. -/
+read in the preferred chart at this point.
+The parameter `n` belongs to `WithTop ℕ∞`, i.e., it can be a natural number, `∞`, or `ω`
+(when the `ContDiff` scope is open), where `C^ω` corresponds to analytic functions. -/
 def ContMDiffWithinAt (n : WithTop ℕ∞) (f : M → M') (s : Set M) (x : M) :=
   LiftPropWithinAt (ContDiffWithinAtProp I I' n) f s x
 
 variable (I I') in
 /-- A function is `n` times continuously differentiable at a point in a manifold if
 it is continuous and it is `n` times continuously differentiable around this point, when
-read in the preferred chart at this point. -/
+read in the preferred chart at this point.
+The parameter `n` belongs to `WithTop ℕ∞`, i.e., it can be a natural number, `∞`, or `ω`
+(when the `ContDiff` scope is open), where `C^ω` corresponds to analytic functions. -/
 def ContMDiffAt (n : WithTop ℕ∞) (f : M → M') (x : M) :=
   ContMDiffWithinAt I I' n f univ x
 
@@ -177,14 +188,18 @@ theorem contMDiffAt_iff {n : WithTop ℕ∞} {f : M → M'} {x : M} :
 variable (I I') in
 /-- A function is `n` times continuously differentiable in a set of a manifold if it is continuous
 and, for any pair of points, it is `n` times continuously differentiable on this set in the charts
-around these points. -/
+around these points.
+The parameter `n` belongs to `WithTop ℕ∞`, i.e., it can be a natural number, `∞`, or `ω`
+(when the `ContDiff` scope is open), where `C^ω` corresponds to analytic functions. -/
 def ContMDiffOn (n : WithTop ℕ∞) (f : M → M') (s : Set M) :=
   ∀ x ∈ s, ContMDiffWithinAt I I' n f s x
 
 variable (I I') in
 /-- A function is `n` times continuously differentiable in a manifold if it is continuous
 and, for any pair of points, it is `n` times continuously differentiable in the charts
-around these points. -/
+around these points.
+The parameter `n` belongs to `WithTop ℕ∞`, i.e., it can be a natural number, `∞`, or `ω`
+(when the `ContDiff` scope is open), where `C^ω` corresponds to analytic functions. -/
 def ContMDiff (n : WithTop ℕ∞) (f : M → M') :=
   ∀ x, ContMDiffAt I I' n f x
 
@@ -618,7 +633,7 @@ theorem contMDiffWithinAt_iff_le_ne_infty :
   | coe n =>
     exact contMDiffWithinAt_iff_nat.2 (fun m hm ↦ h _ (mod_cast hm) (by simp))
 
-/-- A function is `C^n`at a point iff it is `C^m`at this point, for
+/-- A function is `C^n` at a point iff it is `C^m` at this point, for
 any `m ≤ n` which is different from `∞`. This result is useful because, when `m ≠ ∞`, being
 `C^m` extends locally to a neighborhood, giving flexibility for local proofs. -/
 theorem contMDiffAt_iff_le_ne_infty :

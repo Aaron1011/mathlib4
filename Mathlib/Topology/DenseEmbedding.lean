@@ -3,8 +3,10 @@ Copyright (c) 2019 Reid Barton. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Johannes Hölzl, Mario Carneiro, Patrick Massot
 -/
-import Mathlib.Topology.Bases
-import Mathlib.Topology.Separation.Regular
+module
+
+public import Mathlib.Topology.Bases
+public import Mathlib.Topology.Separation.Regular
 
 /-!
 # Dense embeddings
@@ -21,6 +23,8 @@ The main theorem `continuous_extend` gives a criterion for a function
 has to be `IsDenseInducing` (not necessarily injective).
 
 -/
+
+@[expose] public section
 
 
 noncomputable section
@@ -41,7 +45,7 @@ namespace IsDenseInducing
 variable [TopologicalSpace α] [TopologicalSpace β]
 
 theorem _root_.Dense.isDenseInducing_val {s : Set α} (hs : Dense s) :
-    IsDenseInducing (@Subtype.val α s) := ⟨IsInducing.subtypeVal, hs.denseRange_val⟩
+    IsDenseInducing ((↑) : s → α) := ⟨IsInducing.subtypeVal, hs.denseRange_val⟩
 
 variable {i : α → β}
 

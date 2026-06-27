@@ -3,9 +3,11 @@ Copyright (c) 2021 Damiano Testa. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Damiano Testa
 -/
-import Mathlib.Algebra.Group.Basic
-import Mathlib.Order.Basic
-import Mathlib.Order.Monotone.Defs
+module
+
+public import Mathlib.Algebra.Group.Basic
+public import Mathlib.Order.Basic
+public import Mathlib.Order.Monotone.Defs
 
 /-!
 
@@ -53,6 +55,8 @@ However, sometimes as a **non-typeclass** assumption, we prefer `flip (*)` (or `
 as it is easier to use.
 
 -/
+
+@[expose] public section
 
 
 -- TODO: convert `ExistsMulOfLE`, `ExistsAddOfLE`?
@@ -252,10 +256,6 @@ abbrev AddRightReflectLE [Add M] [LE M] : Prop :=
   ContravariantClass M M (swap (· + ·)) (· ≤ ·)
 
 attribute [to_additive existing] MulLeftReflectLE MulRightReflectLE
-
-instance [Add M] [Preorder M] [i₁ : AddRightMono M] [i₂ : AddRightReflectLE M] :
-    Lean.Grind.OrderedAdd M where
-  add_le_left_iff := fun c => ⟨i₁.elim c, i₂.elim c⟩
 
 theorem rel_iff_cov [CovariantClass M N μ r] [ContravariantClass M N μ r] (m : M) {a b : N} :
     r (μ m a) (μ m b) ↔ r a b :=

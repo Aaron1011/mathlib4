@@ -3,8 +3,11 @@ Copyright (c) 2017 Kim Morrison. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Patrick Massot, Kim Morrison, Mario Carneiro
 -/
-import Mathlib.CategoryTheory.Elementwise
-import Mathlib.Topology.ContinuousMap.Basic
+module
+
+public import Mathlib.CategoryTheory.ConcreteCategory.Forget
+public import Mathlib.CategoryTheory.Elementwise
+public import Mathlib.Topology.ContinuousMap.Basic
 
 /-!
 # Category instance for topological spaces
@@ -15,6 +18,8 @@ with the corresponding discrete, resp. trivial, topology. For a proof that these
 resp. right adjoint to the forgetful functor, see
 `Mathlib/Topology/Category/TopCat/Adjunctions.lean`.
 -/
+
+@[expose] public section
 
 assert_not_exists Module
 
@@ -30,6 +35,17 @@ structure TopCat where
   /-- The underlying type. -/
   carrier : Type u
   [str : TopologicalSpace carrier]
+
+section Notation
+
+open Lean.PrettyPrinter.Delaborator
+
+/-- This prevents `TopCat.of X` being printed as `{ carrier := X, str := ... }` by
+`delabStructureInstance`. -/
+@[app_delab TopCat.of]
+meta def TopCat.delabOf : Delab := delabApp
+
+end Notation
 
 attribute [instance] TopCat.str
 
@@ -51,7 +67,7 @@ variable {X} in
 /-- The type of morphisms in `TopCat`. -/
 @[ext]
 structure Hom (X Y : TopCat.{u}) where
-  private mk ::
+  --private mk ::
   /-- The underlying `ContinuousMap`. -/
   hom' : C(X, Y)
 
@@ -135,6 +151,12 @@ lemma hom_inv_id_apply {X Y : TopCat} (f : X ≅ Y) (x : X) : f.inv (f.hom x) = 
 lemma inv_hom_id_apply {X Y : TopCat} (f : X ≅ Y) (y : Y) : f.hom (f.inv y) = y := by
   simp
 
+/-- Morphisms in `TopCat` are equivalent to continuous maps. -/
+@[simps]
+def Hom.equivContinuousMap (X Y : TopCat.{u}) : (X ⟶ Y) ≃ C(X, Y) where
+  toFun f := f.hom
+  invFun f := ofHom f
+
 /--
 Replace a function coercion for a morphism `TopCat.of X ⟶ TopCat.of Y` with the definitionally
 equal function coercion for a continuous map `C(X, Y)`.
@@ -142,7 +164,7 @@ equal function coercion for a continuous map `C(X, Y)`.
 @[simp] theorem coe_of_of {X Y : Type u} [TopologicalSpace X] [TopologicalSpace Y]
     {f : C(X, Y)} {x} :
     @DFunLike.coe (TopCat.of X ⟶ TopCat.of Y) ((CategoryTheory.forget TopCat).obj (TopCat.of X))
-      (fun _ ↦ (CategoryTheory.forget TopCat).obj (TopCat.of Y)) HasForget.instFunLike
+      (fun _ ↦ (CategoryTheory.forget TopCat).obj (TopCat.of Y)) ConcreteCategory.instFunLike
       (ofHom f) x =
     @DFunLike.coe C(X, Y) X
       (fun _ ↦ Y) _
@@ -231,5 +253,13 @@ theorem isOpenEmbedding_iff_isIso_comp' {X Y Z : TopCat} (f : X ⟶ Y) (g : Y �
     IsOpenEmbedding (g ∘ f) ↔ IsOpenEmbedding g := by
   simp only
   exact isOpenEmbedding_iff_isIso_comp f g
+
+/-- The constant morphism `X ⟶ Y` in `TopCat` given by `y : Y`. -/
+def const {X Y : TopCat.{u}} (y : Y) : X ⟶ Y :=
+  ofHom ⟨fun _ ↦ y, by continuity⟩
+
+@[simp]
+lemma const_apply {X Y : TopCat.{u}} (y : Y) (x : X) :
+    const y x = y := rfl
 
 end TopCat

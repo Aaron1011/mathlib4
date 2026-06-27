@@ -4,14 +4,17 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Kevin Buzzard, Patrick Massot
 -/
 -- This file is to a certain extent based on `quotient_module.lean` by Johannes Hölzl.
+module
 
-import Mathlib.Algebra.Group.Subgroup.Finite
-import Mathlib.Data.Finite.Prod
-import Mathlib.GroupTheory.QuotientGroup.Basic
+public import Mathlib.Algebra.Group.Subgroup.Finite
+public import Mathlib.Data.Finite.Prod
+public import Mathlib.GroupTheory.QuotientGroup.Basic
 
 /-!
 # Deducing finiteness of a group.
 -/
+
+@[expose] public section
 
 open Function QuotientGroup Subgroup
 open scoped Pointwise
@@ -24,7 +27,7 @@ namespace Group
 
 open scoped Classical in
 /-- If `F` and `H` are finite such that `ker(G →* H) ≤ im(F →* G)`, then `G` is finite. -/
-@[to_additive
+@[to_additive (attr := implicit_reducible)
 /-- If `F` and `H` are finite such that `ker(G →+ H) ≤ im(F →+ G)`, then `G` is finite. -/]
 noncomputable def fintypeOfKerLeRange (h : g.ker ≤ f.range) : Fintype G :=
   @Fintype.ofEquiv _ _
@@ -33,19 +36,21 @@ noncomputable def fintypeOfKerLeRange (h : g.ker ≤ f.range) : Fintype G :=
     groupEquivQuotientProdSubgroup.symm
 
 /-- If `F` and `H` are finite such that `ker(G →* H) = im(F →* G)`, then `G` is finite. -/
-@[to_additive
+@[to_additive (attr := implicit_reducible)
 /-- If `F` and `H` are finite such that `ker(G →+ H) = im(F →+ G)`, then `G` is finite. -/]
 noncomputable def fintypeOfKerEqRange (h : g.ker = f.range) : Fintype G :=
   fintypeOfKerLeRange _ _ h.le
 
 /-- If `ker(G →* H)` and `H` are finite, then `G` is finite. -/
-@[to_additive /-- If `ker(G →+ H)` and `H` are finite, then `G` is finite. -/]
+@[to_additive (attr := implicit_reducible)
+  /-- If `ker(G →+ H)` and `H` are finite, then `G` is finite. -/]
 noncomputable def fintypeOfKerOfCodom [Fintype g.ker] : Fintype G :=
   fintypeOfKerLeRange ((topEquiv : _ ≃* G).toMonoidHom.comp <| inclusion le_top) g fun x hx =>
     ⟨⟨x, hx⟩, rfl⟩
 
 /-- If `F` and `coker(F →* G)` are finite, then `G` is finite. -/
-@[to_additive /-- If `F` and `coker(F →+ G)` are finite, then `G` is finite. -/]
+@[to_additive (attr := implicit_reducible)
+  /-- If `F` and `coker(F →+ G)` are finite, then `G` is finite. -/]
 noncomputable def fintypeOfDomOfCoker [Normal f.range] [Fintype <| G ⧸ f.range] : Fintype G :=
   fintypeOfKerLeRange _ (mk' f.range) fun x => (eq_one_iff x).mp
 
