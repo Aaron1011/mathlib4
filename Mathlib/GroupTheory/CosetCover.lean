@@ -133,7 +133,7 @@ theorem rightCoset_cover_const_iff_surjOn :
     ⋃ i ∈ s, (MulOpposite.op (g i)) • (H : Set G) = Set.univ ↔ Set.SurjOn ((fun a => Quotient.mk _ (g a)) : ι → (Quotient (QuotientGroup.rightRel H)))  s Set.univ := by
   -- QuotientGroup.quotientRightRelEquivQuotientLeftRel
   simp [Set.eq_univ_iff_forall, mem_rightCoset_iff, Set.SurjOn,
-    Quotient.forall, QuotientGroup.rightRel_apply]
+    Quotient.forall, Quotient.eq, QuotientGroup.rightRel_apply]
 
 variable (hcovers : ⋃ i ∈ s, (MulOpposite.op (g i)) • (H : Set G) = Set.univ)
 include hcovers
